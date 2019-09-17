@@ -2,16 +2,16 @@ import trimesh
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
+import pandas as pd
 import networkx as nx
 
 
 #scan the whole database
-def scanDB():
-
+def scanDB(path): #input the root paht
     import os
-    path = "/Users/darkqian/PycharmProjects/MR/LabeledDB"
+    stacks = np.array(['className','fileName','verticeNumber','faceNumber','bounding_box_volume'])
     files = os.listdir(path)
-    i = 0
+    # count = 1
     for lables in files:
         try:
             lable = os.listdir(path + '/' + lables)
@@ -19,21 +19,27 @@ def scanDB():
             continue
         for file in lable:
             if not os.path.isdir(file) and not os.path.splitext(file)[-1] == '.txt':
-                f = path + '/' + lables + "/" + file
-                print(file + ' ' + lables)
-                Meshfilter(f)
-                #viewMesh(f)
-                i += 1
-
-    print(i)
+                f = path + '/' + lables + "/" + file  #file path
+                dataForSingleFile = [lables, file]
+                for eachAttributes in Meshfilter(f):
+                    dataForSingleFile.append(eachAttributes)
+                # print(dataForSingleFile)
+                stacks = np.vstack((stacks, dataForSingleFile))
+                # print(count)
+                # count  = count+1
+    return stacks  # in the end we got the data containing : className,fileName,vertice number,face number,bounding box volume
 
 def Meshfilter(filepath):
-
     mesh = trimesh.load_mesh(filepath)
+    vertice=mesh.vertices.shape[0]
+    faces=mesh.faces.shape[0]
+    Bounding_box_volume = mesh.bounding_box_oriented.volume
+    if faces < 100 or vertice< 100:
+        print(filepath,' ',"problem file")
+    return vertice,faces,Bounding_box_volume
 
-    print("Number of vertices: ", mesh.vertices.shape[0])
-    print("Number of faces: ", mesh.faces.shape[0])
-    print("Bounding box volume: ", mesh.bounding_box_oriented.volume)
+
+
 
 
 
@@ -79,5 +85,6 @@ def viewMesh(filepath):
     
     scene.show()
     '''
-
-scanDB()
+path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
+dataframe = scanDB(path)
+pd.DataFrame(dataframe).to_csv("file.csv")
