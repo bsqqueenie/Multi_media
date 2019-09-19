@@ -12,6 +12,8 @@ def scanDB(path): #input the root paht
     stacks = np.array(['className','fileName','verticeNumber','faceNumber','bounding_box_volume'])
     files = os.listdir(path)
     count = 1
+    sumOfVolumn=0
+    meshList = []
     for lables in files:
         try:
             lable = os.listdir(path + '/' + lables)
@@ -21,24 +23,49 @@ def scanDB(path): #input the root paht
             if not os.path.isdir(file) and not os.path.splitext(file)[-1] == '.txt':
                 f = path + '/' + lables + "/" + file  #file path
                 dataForSingleFile = [lables, file]
-                for eachAttributes in Meshfilter(f):
+                mesh= trimesh.load_mesh(f)
+                meshList.append(mesh)
+                for eachAttributes in Meshfilter(mesh,f):
                     dataForSingleFile.append(eachAttributes)
+                sumOfVolumn = sumOfVolumn + Meshfilter(mesh,f)[2]
                 # print(dataForSingleFile)
                 stacks = np.vstack((stacks, dataForSingleFile))
                 print(count)
                 count  = count+1
-    return stacks  # in the end we got the data containing : className,fileName,vertice number,face number,bounding box volume
 
-def Meshfilter(filepath):
-    mesh = trimesh.load_mesh(filepath)
+avgOfVolumn = sumOfVolumn/count
+    
+    return stacks,meshList,avgOfVolumn
+# in the end we got the data containing : className,fileName,vertice number,face number,bounding box volume
+# the list of mesh
+# average of bounding box volumn
+
+
+
+def Meshfilter(mesh,filepath):
+    
     vertice=mesh.vertices.shape[0]
     faces=mesh.faces.shape[0]
     Bounding_box_volume = mesh.bounding_box_oriented.volume
-    centerMass = mesh.center_mass
+    
     if faces < 100 or vertice< 100:
         print(filepath,' ',"problem file")
     return vertice,faces,Bounding_box_volume
 
+
+def normalization(meshList,avgVolumn):
+    newMeshList=[]
+    count=1
+    for eachMesh in meshList:
+        # meshName = trimesh.load_mesh(filepath)
+        # create a matrix for tanslation to the [0,0,0]
+        matrix = np.array([np.absolute(eachMesh.center_mass[0]), np.absolute(eachMesh.center_mass[1]), np.absolute(eachMesh.center_mass[2])])
+        eachMesh.apply_translation(matrix)  # move the tresh to the origin
+        eachMesh.apply_scale(pow(avgVolumn / eachMesh.bounding_box_oriented.volume, 1 / 3))
+        newMeshList.append(eachMesh)
+        print(count)
+        count=count+1
+    return newMeshList
 
 
 
@@ -86,48 +113,12 @@ def viewMesh(filepath):
         
         scene.show()
         '''
-# path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
-# dataframe = scanDB(path)
-# pd.DataFrame(dataframe).to_csv("file.csv",header=False,index=False)
-
-
-def save2CSV(dataBasePath):
-    dataframe = scanDB(dataBasePath)
-    pd.DataFrame(dataframe).to_csv("file.csv", header=False, index=False)
-
-# test Of save2CSV
-
-# path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
-# save2CSV(path)  # get the csv file
+path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
+dataframe,meshList,avgVolumn = scanDB(path)
+newMeshList= normalization(meshList,avgVolumn)
+print(newMeshList[0].bounding_box_oriented.volume,newMeshList[1].bounding_box_oriented.volume)
+pd.DataFrame(dataframe).to_csv("file.csv", header=False, index=False)
 
 
 
-# read the csv and calculate the average bounding-box volumn
 
-csvPath= "/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/file.csv"
-data= pd.read_csv(csvPath)
-avgVol=np.average(data.iloc[:,-1])
-
-
-def normalization(meshName,avgVolumn):
-    
-    # create a matrix for tanslation to the [0,0,0]
-    matrix = np.array([np.absolute(meshName.center_mass[0]), np.absolute(meshName.center_mass[1]), np.absolute(meshName.center_mass[2])])
-    meshName.apply_translation(matrix)  # move the tresh to the origin
-    meshName.apply_scale(pow(avgVolumn / meshName.bounding_box_oriented.volume, 1 / 3))
-    
-    return meshName
-
-
-
-### test test !
-
-path1='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new/Ant/81.off'
-path2='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new/Ant/82.off'
-mesh1 = trimesh.load_mesh(path1)
-mesh2 = trimesh.load_mesh(path2)
-
-newMesh1= normalization(mesh1,avgVol)
-newMesh2=normalization(mesh2,avgVol)
-
-print(newMesh1.bounding_box_oriented.volume,newMesh2.bounding_box_oriented.volume)
