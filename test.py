@@ -91,14 +91,24 @@ dataframe = scanDB(path)
 pd.DataFrame(dataframe).to_csv("file.csv",header=False,index=False)
 
 
+def save2CSV(dataBasePath):
+    dataframe = scanDB(dataBasePath)
+    pd.DataFrame(dataframe).to_csv("file.csv", header=False, index=False)
 
-# read the csv and calculate the average bounding-box volumn
+# test Of save2CSV
 
-csvPath= "/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/file.csv"
-data= pd.read_csv(csvPath)
-avgVol=np.average(data.iloc[:,-1])
+# path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
+# save2CSV(path)  # get the csv file
 
 
+
+# # read the csv and calculate the average bounding-box volumn
+#
+# csvPath= "/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/file.csv"
+# data= pd.read_csv(csvPath)
+# avgVol=np.average(data.iloc[:,-1])
+#
+#
 # test test!!!
 
 print(Meshfilter(ffffffff))
