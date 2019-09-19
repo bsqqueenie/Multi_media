@@ -86,9 +86,9 @@ def viewMesh(filepath):
         
         scene.show()
         '''
-path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
-dataframe = scanDB(path)
-pd.DataFrame(dataframe).to_csv("file.csv",header=False,index=False)
+# path='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new'
+# dataframe = scanDB(path)
+# pd.DataFrame(dataframe).to_csv("file.csv",header=False,index=False)
 
 
 def save2CSV(dataBasePath):
@@ -102,13 +102,32 @@ def save2CSV(dataBasePath):
 
 
 
-# # read the csv and calculate the average bounding-box volumn
-#
-# csvPath= "/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/file.csv"
-# data= pd.read_csv(csvPath)
-# avgVol=np.average(data.iloc[:,-1])
-#
-#
-# test test!!!
+# read the csv and calculate the average bounding-box volumn
 
-print(Meshfilter(ffffffff))
+csvPath= "/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/file.csv"
+data= pd.read_csv(csvPath)
+avgVol=np.average(data.iloc[:,-1])
+
+
+def normalization(meshName,avgVolumn):
+    
+    # create a matrix for tanslation to the [0,0,0]
+    matrix = np.array([np.absolute(meshName.center_mass[0]), np.absolute(meshName.center_mass[1]), np.absolute(meshName.center_mass[2])])
+    meshName.apply_translation(matrix)  # move the tresh to the origin
+    meshName.apply_scale(pow(avgVolumn / meshName.bounding_box_oriented.volume, 1 / 3))
+    
+    return meshName
+
+
+
+### test test !
+
+path1='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new/Ant/81.off'
+path2='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new/Ant/82.off'
+mesh1 = trimesh.load_mesh(path1)
+mesh2 = trimesh.load_mesh(path2)
+
+newMesh1= normalization(mesh1,avgVol)
+newMesh2=normalization(mesh2,avgVol)
+
+print(newMesh1.bounding_box_oriented.volume,newMesh2.bounding_box_oriented.volume)
