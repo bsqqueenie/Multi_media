@@ -34,6 +34,7 @@ def Meshfilter(filepath):
     vertice=mesh.vertices.shape[0]
     faces=mesh.faces.shape[0]
     Bounding_box_volume = mesh.bounding_box_oriented.volume
+    centerMass = mesh.center_mass
     if faces < 100 or vertice< 100:
         print(filepath,' ',"problem file")
     return vertice,faces,Bounding_box_volume
@@ -97,3 +98,7 @@ csvPath= "/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignme
 data= pd.read_csv(csvPath)
 avgVol=np.average(data.iloc[:,-1])
 
+
+# test test!!!
+
+print(Meshfilter(ffffffff))
