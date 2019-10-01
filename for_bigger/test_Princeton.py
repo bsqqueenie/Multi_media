@@ -81,13 +81,15 @@ def merge2dicts(dict1, dcit2):
     return new  # return merged dictionary
 
 
-def normalization(meshList, avgVolumn):
+def normalization(meshList, avgVolumn=1):
     newMeshList = []
     count = 1
     for eachMesh in meshList:
         # meshName = trimesh.load_mesh(filepath)
         # create a matrix for tanslation to the [0,0,0]
-        eachMesh.apply_scale(pow(avgVolumn / eachMesh.bounding_box_oriented.volume, 1 / 3))
+
+        maxLengthOfSide = max(eachMesh.bounding_box_oriented.primitive.extents)
+        eachMesh.apply_scale(avgVolumn/maxLengthOfSide)
         normalizationOfCoordinates = []
         for eachValue in eachMesh.center_mass:
             if eachValue <= 0:
