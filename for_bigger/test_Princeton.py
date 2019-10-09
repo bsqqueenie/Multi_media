@@ -131,6 +131,7 @@ def normalization(meshList, avgVolumn=1):
         print('Barycenter:', mesh.center_mass)
         print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents,"\n")
         mesh.show()
+        
         '''
 
         # Alignment
@@ -207,7 +208,7 @@ def normalization(meshList, avgVolumn=1):
         newMeshList.append(mesh)
         # print(count)
         count = count + 1
-        
+
     return newMeshList
 
 
