@@ -4,12 +4,20 @@ import networkx as nx
 import pandas as pd
 import subprocess
 import os
+from sklearn.decomposition import PCA
 # #
 # offPath='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/db/0/m94/m94.off'
 # plyPath='/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/m0.off.ply'
 # mesh = trimesh.load_mesh(offPath)
 
+ori = [0, 0, 0]
 
+def translation(mesh, center):
+    i = 0
+    for vertex in mesh.vertices:
+        mesh.vertices[i] = vertex - center
+        i += 1
+    return mesh
 
 def refineMesh(issueFileTxt,outPutPath,jarPath):  # this function is for those meshes that have less than 100 faces and vertices
     count = 1
@@ -88,19 +96,118 @@ def normalization(meshList, avgVolumn=1):
         # meshName = trimesh.load_mesh(filepath)
         # create a matrix for tanslation to the [0,0,0]
 
-        maxLengthOfSide = max(eachMesh.bounding_box_oriented.primitive.extents)
-        eachMesh.apply_scale(avgVolumn/maxLengthOfSide)
-        normalizationOfCoordinates = []
-        for eachValue in eachMesh.center_mass:
-            if eachValue <= 0:
-                normalizationOfCoordinates.append(eachValue)
-            else:
-                normalizationOfCoordinates.append(-np.absolute(eachValue))
+        numOfvertives = mesh.vertices.shape[0]
+        numOffaces = mesh.faces.shape[0]
+        print('Original')
+        print('Number of vertices and faces of the mesh:', numOfvertives, numOffaces)
+        print('Barycenter:', mesh.center_mass)
+        print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
+        mesh.show()
 
-        eachMesh.apply_translation(normalizationOfCoordinates)  # move the tresh to the origin
-        newMeshList.append(eachMesh)
+        # Centering
+
+        center = mesh.center_mass
+        Dis = np.linalg.norm(center - ori)
+
+        while (Dis >= 0.05):
+            mesh = translation(mesh, center)  # move the mesh to the originz
+            center = mesh.center_mass
+            print("New center:", center)
+            Dis = np.linalg.norm(center - ori)
+            print("Dis:", Dis)
+
+        print('Centering done')
+        print('Barycenter:', mesh.center_mass)
+        print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
+        mesh.show()
+
+        '''
+        #Scaling
+
+        maxLengthOfSide = max(mesh.bounding_box_oriented.primitive.extents)
+        mesh.apply_scale(1 / maxLengthOfSide)
+
+        print('Scaling done')
+        print('Barycenter:', mesh.center_mass)
+        print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents,"\n")
+        mesh.show()
+        '''
+
+        # Alignment
+
+        pca = PCA(n_components=2)
+        Reduced_mesh = pca.fit_transform(mesh.vertices)
+        print(pca.components_)
+
+        transform_x = trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0])
+        mesh.apply_transform(transform_x)
+        Reduced_mesh_newx = pca.fit_transform(mesh.vertices)
+
+        transform_y = trimesh.geometry.align_vectors(pca.components_[1], [0, 1, 0])
+        mesh.apply_transform(transform_y)
+        Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
+        print(pca.components_)
+
+        print('Alignment done')
+        print('Barycenter:', mesh.center_mass)
+        print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
+        mesh.show()
+
+        # Flipping
+
+        moment_lx = 0
+        moment_rx = 0
+        moment_ly = 0
+        moment_ry = 0
+        moment_lz = 0
+        moment_rz = 0
+
+        for vertex in mesh.vertices:
+            if vertex[2] <= 0:
+                moment_lz += np.linalg.norm(vertex - ori)
+            else:
+                moment_rz += np.linalg.norm(vertex - ori)
+        if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
+            transform = trimesh.geometry.align_vectors([0, 0, 1], [0, 0, -1])
+            mesh.apply_transform(transform)
+
+        for vertex in mesh.vertices:
+            if vertex[0] <= 0:
+                moment_lx += np.linalg.norm(vertex - ori)
+            else:
+                moment_rx += np.linalg.norm(vertex - ori)
+        if moment_lx < moment_rx:  # right side of x axis should be the moment higher side
+            transform = trimesh.geometry.align_vectors([1, 0, 0], [-1, 0, 0])
+            mesh.apply_transform(transform)
+
+        for vertex in mesh.vertices:
+            if vertex[1] <= 0:
+                moment_ly += np.linalg.norm(vertex - ori)
+            else:
+                moment_ry += np.linalg.norm(vertex - ori)
+        if moment_ly < moment_ry:  # right side of y axis should be the moment higher side
+            transform = trimesh.geometry.align_vectors([0, 1, 0], [0, -1, 0])
+            mesh.apply_transform(transform)
+
+        print('Flipping done')
+        print('Barycenter:', mesh.center_mass)
+        print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents)
+        mesh.show()
+
+        # Scaling
+
+        maxLengthOfSide = max(mesh.bounding_box_oriented.primitive.extents)
+        mesh.apply_scale(1 / maxLengthOfSide)
+
+        print('Scaling done')
+        print('Barycenter:', mesh.center_mass)
+        print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
+        mesh.show()
+        # move the tresh to the origin
+        newMeshList.append(mesh)
         # print(count)
         count = count + 1
+        
     return newMeshList
 
 
