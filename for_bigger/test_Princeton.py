@@ -106,18 +106,18 @@ def normalization(meshList, avgVolumn=1):
 
         # Centering
 
-        center = mesh.center_mass
+        center = sum(mesh.vertices)/mesh.vertices.shape[0]
         Dis = np.linalg.norm(center - ori)
 
         while (Dis >= 0.05):
             mesh = translation(mesh, center)  # move the mesh to the originz
-            center = mesh.center_mass
+            center = sum(mesh.vertices)/mesh.vertices.shape[0]
             print("New center:", center)
             Dis = np.linalg.norm(center - ori)
             print("Dis:", Dis)
 
         print('Centering done')
-        print('Barycenter:', mesh.center_mass)
+        print('Barycenter:', sum(mesh.vertices)/mesh.vertices.shape[0])
         print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
         mesh.show()
 

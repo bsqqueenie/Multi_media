@@ -31,9 +31,9 @@ def Normalization(path):
 
     #Centering
 
-    center = mesh.center_mass
+    center = sum(mesh.vertices)/mesh.vertices.shape[0]
     mesh.apply_translation(ori-center)
-    center = mesh.center_mass
+    center = sum(mesh.vertices)/mesh.vertices.shape[0]
     Dis = np.linalg.norm(center - ori)
     print("New center:", center)
     print("Dis:", Dis)
@@ -41,13 +41,13 @@ def Normalization(path):
     while(Dis >= 0.05):
 
         mesh.apply_translation(ori - center)  # move the mesh to the originz
-        center = mesh.center_mass
+        center = sum(mesh.vertices)/mesh.vertices.shape[0]
         Dis = np.linalg.norm(center - ori)
         print("New center:", center)
         print("Dis:", Dis)
 
     print('Centering done')
-    print('Barycenter:', mesh.center_mass)
+    print('Barycenter:', sum(mesh.vertices)/mesh.vertices.shape[0])
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents,"\n")
     mesh.show()
     
@@ -140,7 +140,7 @@ def Normalization(path):
     mesh.show()
 
 
-#Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
+Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
 
 def querying(path):
     filename_list = []
@@ -151,7 +151,7 @@ def querying(path):
     new_data = pd.concat([data.iloc[:,0], norm_data], 1)
     print(new_data)
     row = new_data.shape[0]
-    Target = new_data.iloc[224, 1:]
+    Target = new_data.iloc[1785, 1:] #set target model
 
     for i in range(row):
 
@@ -174,7 +174,10 @@ def querying(path):
         mesh.show()
 
 
-querying("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/allfeature.csv")
+#querying("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/allfeature.csv")
 #mesh = trimesh.load_mesh('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
+#print(sum(mesh.vertices)/mesh.vertices.shape[0])
+#mesh.apply_translation((-0.291303,-0.210208,-0.521506))
+
 #barycenter = ndimage.m
 #print(barycenter)
