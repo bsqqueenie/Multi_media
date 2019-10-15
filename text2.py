@@ -3,17 +3,13 @@ import tkinter as tk
 from tkinter import filedialog
 import numpy as np
 import pandas as pd
+from pandas import Series
 import networkx as nx
 from sklearn.decomposition import PCA
+from scipy import ndimage
+
 
 ori = [0, 0, 0]
-
-def translation(mesh, center):
-    i = 0
-    for vertex in mesh.vertices:
-        mesh.vertices[i] = vertex - center
-        i += 1
-    return mesh
 
 def Normalization(path):
 
@@ -36,14 +32,18 @@ def Normalization(path):
     #Centering
 
     center = mesh.center_mass
+    mesh.apply_translation(ori-center)
+    center = mesh.center_mass
     Dis = np.linalg.norm(center - ori)
+    print("New center:", center)
+    print("Dis:", Dis)
 
     while(Dis >= 0.05):
 
-        mesh = translation(mesh, center)  # move the mesh to the originz
+        mesh.apply_translation(ori - center)  # move the mesh to the originz
         center = mesh.center_mass
-        print("New center:", center)
         Dis = np.linalg.norm(center - ori)
+        print("New center:", center)
         print("Dis:", Dis)
 
     print('Centering done')
@@ -95,7 +95,7 @@ def Normalization(path):
     moment_rz = 0
 
     for vertex in mesh.vertices:
-        if vertex[2] <= 0:
+        if vertex[2] <= mesh.center_mass[2]:
             moment_lz += np.linalg.norm(vertex - ori)
         else:
             moment_rz += np.linalg.norm(vertex - ori)
@@ -104,7 +104,7 @@ def Normalization(path):
         mesh.apply_transform(transform)
 
     for vertex in mesh.vertices:
-        if vertex[0] <= 0:
+        if vertex[0] <= mesh.center_mass[0]:
             moment_lx += np.linalg.norm(vertex - ori)
         else:
             moment_rx += np.linalg.norm(vertex - ori)
@@ -114,7 +114,7 @@ def Normalization(path):
 
 
     for vertex in mesh.vertices:
-        if vertex[1] <= 0:
+        if vertex[1] <= mesh.center_mass[1]:
             moment_ly += np.linalg.norm(vertex - ori)
         else:
             moment_ry += np.linalg.norm(vertex - ori)
@@ -140,4 +140,41 @@ def Normalization(path):
     mesh.show()
 
 
-Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m6/m6.off')
+#Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
+
+def querying(path):
+    filename_list = []
+    dislist = [0]
+    data = pd.read_csv(path)
+    norm_data = (data.iloc[:,1:] - data.iloc[:,1:].min()) / (data.iloc[:,1:].max() - data.iloc[:,1:].min())
+    #norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
+    new_data = pd.concat([data.iloc[:,0], norm_data], 1)
+    print(new_data)
+    row = new_data.shape[0]
+    Target = new_data.iloc[224, 1:]
+
+    for i in range(row):
+
+        Com = new_data.iloc[i, 1:]
+
+        Dis = np.linalg.norm(Target - Com)
+        dislist.append(Dis)
+    del(dislist[0])
+    new_data.insert(0, "Distance", dislist)
+    new_data = new_data.sort_values(by = "Distance")
+    print(new_data.head(10))
+
+    for i in range(5): #save the target file itself and its 5 top matching
+        filename_list.append(new_data.iloc[i,1])
+
+    for j in range(5): #show meshes
+        number = float(filename_list[j][1:-4])
+        direname1 = number // 100
+        mesh = trimesh.load_mesh('/Users/darkqian/PycharmProjects/MR/benchmark/db/'+ str(int(direname1)) + '/m' + str(int(number)) +'/m' + str(int(number)) +'.off')
+        mesh.show()
+
+
+querying("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/allfeature.csv")
+#mesh = trimesh.load_mesh('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
+#barycenter = ndimage.m
+#print(barycenter)
