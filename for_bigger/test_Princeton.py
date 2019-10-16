@@ -339,12 +339,19 @@ def normalization(meshList):
 def feature_extraction(meshList): # 传入 normalize 过后的mesh
     counter = 1
     featureStacks = np.array(['fileName','surfaceArea','compactness','boundingBoxVolume','diameter','eccentricity'])
+    B_discriptor = ["A3", "D1", "D2", "D3", "D4"]
+    for i in range(5):
+        count = 1
+        while count < 9:
+            featureStacks = np.append(featureStacks, '{}_{}'.format(B_discriptor[i], count))
+            count = count + 1
+        count = 1
+
+    # after this the header of dataframe was obtained.
     
-    # shapePropertyStacks = np.array(['A3', 'D1', 'D2', 'D3', 'D4'])
     for each in meshList:
         
         try:
-            
             mesh = each[1]
             featureofEachMesh =[]
             # surface area
@@ -377,129 +384,118 @@ def feature_extraction(meshList): # 传入 normalize 过后的mesh
             values, vectors = np.linalg.eig(covarianceMatrix)
             eccentricity = max(values)/min(values)
             featureofEachMesh.extend([each[0],surfaceArea, compactness, boundingBoxVolume, diameter, eccentricity])
-            featureStacks = np.vstack((featureStacks, featureofEachMesh))
+            final = featureofEachMesh + shape_property(mesh,8,False)
+            featureStacks = np.vstack((featureStacks, final))
             print(counter)
             counter = counter + 1
         # print("surface area is {}, compactness is {},axis-aligned-bounding-box volume is {},diameter is {},eccentricity is {}".format(surfaceArea,compactness,boundingBoxVolume,diameter,eccentricity))
         except:
-            print(each[1], "error with this file")
+            print(each[0], "error with this file")
 
 return featureStacks
 
-
-
-def shape_property(meshList, bins=8, showPlot=False):
-    meshCounter = 1
+def shape_property(mesh, bins=8, showPlot=False):
     
-    allFeature = []
-    for each in meshList:
-        mesh = each[1]
-        A3holder = []
-        D1holder = []
-        D2holder = []
-        D3holder = []
-        D4holder = []
-        
-        for i in range(len(mesh.vertices)):
-            
-            
-            
-            # print(i)
-            
-            vertex = mesh.vertices[i]  # 获取中心点
-            
-            # A3:angle between 3 random vertices
-            
-            while True: # 要在去除当前选中的中心点之外的顶点中不重复选取两点
-                index = random.sample(range(len(mesh.vertices)), 2)
-                if (index[0] != i and index[1] != i):
-                    break
-            A3holder.append(angle(mesh.vertices[index[0]], vertex, mesh.vertices[index[1]]).item())
-            
-            
-            # D1 : distance between barycenter and random vertex
-            
-            barycenter = mesh.center_mass.tolist()
-            D1holder.append(pow(sum((barycenter - vertex) ** 2), 1 / 2).item())  # compute the distance between barycenter and the random vertex
-            
-            # D2: distance between 2 random vertices
-            
-            while True: # 要在去除当前选中的中心点之外的顶点中不重复选取两点
-                index = random.sample(range(len(mesh.vertices)), 1)
-                if (index[0] != i):
-                    break
-            v1 = vertex
-            v2 = mesh.vertices[index][0]
-            D2holder.append(float(pow(sum((v1 - v2) ** 2), 1 / 2)))
-            
-            # D3:  square root of area of triangle given by 3 random vertices
-            while True:  # 要在去除当前选中的中心点之外的顶点中不重复选取两点
-                index = random.sample(range(len(mesh.vertices)), 2)
-                if (index[0] != i and index[1] != i):
-                    break
-                    areaofTriangle = area(mesh.vertices[index][0], mesh.vertices[index][1], vertex)
-                    D3holder.append(float(areaofTriangle ** (1 / 2)))
-                    
-                    
-                    # D4: cube root (pow(a,1/3)) of volume of tetrahedron formed by 4 random vertices
-                    while True:  # 要在去除当前选中的中心点之外的顶点中不重复选取两点
-                        index = random.sample(range(len(mesh.vertices)), 3)
-                            if (index[0] != i and index[1] != i and index[2] !=i):
-                                break
-                                    volume = tetrahedron_calc_volume(mesh.vertices[index][0], mesh.vertices[index][1], mesh.vertices[index][2],
-                                                                     vertex)
-                                        D4holder.append(float(volume ** (1 / 3)))
-                                            
-                                            
-                                            
-                                            #
-                                            A3counts, A3x, A3y = plt.hist(A3holder, bins=bins)  # bins needs to be defined.
-                                                plt.close()
-                                                    D1counts, D1x, D1y = plt.hist(D1holder, bins=bins)  # bins needs to be defined.
-                                                        plt.close()
-                                                            D2counts, D2x, D2y = plt.hist(D2holder, bins=bins)  # bins needs to be defined.
-                                                                plt.close()
-                                                                    D3counts, D3x, D3y = plt.hist(D3holder, bins=bins)  # bins needs to be defined.
-                                                                        plt.close()
-                                                                            D4counts, D4x, D4y = plt.hist(D4holder, bins=bins)  # bins needs to be defined.
-                                                                                plt.close()
-                                                                                    #
-                                                                                    
-                                                                                    allDataForSingleMesh = [A3counts.tolist(), D1counts.tolist(), D2counts.tolist(), D3counts.tolist(), D4counts.tolist()]
-                                                                                        merged = list(itertools.chain(*allDataForSingleMesh))
-                                                                                            allFeature.append([each[0],merged])
-                                                                                                if meshCounter%10 == 0 or meshCounter == len(meshList):
-                                                                                                    print(meshCounter,'len of stack:',' ', len(allFeature))
-                                                                                                        # print(meshCounter)
-                                                                                                        meshCounter = meshCounter + 1
-
-if showPlot:
-    A3counts, A3x, A3y = plt.hist(A3holder, bins=bins)  # bins needs to be defined.
-        print("A3 counts", A3counts)
-        plt.title("angle between 3 random vertices")
-        plt.show()
-        
-        D1counts, D1x, D1y = plt.hist(D1holder, bins=bins)  # bins needs to be defined.
-        print("D1 counts", D1counts)
-        plt.title("distance between barycenter and random vertex")
-        plt.show()
-        
-        D2counts, D2x, D2y = plt.hist(D2holder, bins=bins)  # bins needs to be defined.
-        print("D2 counts", D2counts)
-        plt.title("distance between 2 random vertices")
-        plt.show()
-        
-        D3counts, D3x, D3y = plt.hist(D3holder, bins=bins)  # bins needs to be defined.
-        print("D3 counts", D3counts)
-        plt.title("square root of area of triangle given by 3 random vertices")
-        plt.show()
-        
-        D4counts, D4x, D4y = plt.hist(D4holder, bins=bins)  # bins needs to be defined.
-        print("D4 counts", D4counts)
-        plt.title("cube root of volume of tetrahedron formed by 4 random vertices")
-        plt.show()
+    A3holder = []
+    D1holder = []
+    D2holder = []
+    D3holder = []
+    D4holder = []
     
-    return allFeature
+    for i in range(len(mesh.vertices)):
+        
+        # print(i)
+        
+        vertex = mesh.vertices[i]  # 获取中心点
+        
+        # A3:angle between 3 random vertices
+        
+        while True:  # 要在去除当前选中的中心点之外的顶点中不重复选取两点
+            index = random.sample(range(len(mesh.vertices)), 2)
+            if (index[0] != i and index[1] != i):
+                break
+        A3holder.append(angle(mesh.vertices[index[0]], vertex, mesh.vertices[index[1]]).item())
+        
+        # D1 : distance between barycenter and random vertex
+        
+        barycenter = mesh.center_mass.tolist()
+        D1holder.append(pow(sum((barycenter - vertex) ** 2),
+                            1 / 2).item())  # compute the distance between barycenter and the random vertex
+            
+                            # D2: distance between 2 random vertices
+                            
+                            while True:  # 要在去除当前选中的中心点之外的顶点中不重复选取两点
+                                index = random.sample(range(len(mesh.vertices)), 1)
+                                    if (index[0] != i):
+                                        break
+                                            v1 = vertex
+                                                v2 = mesh.vertices[index][0]
+                                                    D2holder.append(float(pow(sum((v1 - v2) ** 2), 1 / 2)))
+                                                        
+                                                        # D3:  square root of area of triangle given by 3 random vertices
+                                                        while True:  # 要在去除当前选中的中心点之外的顶点中不重复选取两点
+                                                            index = random.sample(range(len(mesh.vertices)), 2)
+                                                                if (index[0] != i and index[1] != i):
+                                                                    break
+                                                                        areaofTriangle = area(mesh.vertices[index][0], mesh.vertices[index][1], vertex)
+                                                                            D3holder.append(float(areaofTriangle ** (1 / 2)))
+                                                                                
+                                                                                # D4: cube root (pow(a,1/3)) of volume of tetrahedron formed by 4 random vertices
+                                                                                while True:  # 要在去除当前选中的中心点之外的顶点中不重复选取两点
+                                                                                    index = random.sample(range(len(mesh.vertices)), 3)
+                                                                                        if (index[0] != i and index[1] != i and index[2] != i):
+                                                                                            break
+                                                                                                volume = tetrahedron_calc_volume(mesh.vertices[index][0], mesh.vertices[index][1], mesh.vertices[index][2],
+                                                                                                                                 vertex)
+                                                                                                    D4holder.append(float(volume ** (1 / 3)))
+
+#
+A3counts, A3x, A3y = plt.hist(A3holder, bins=bins)  # bins needs to be defined.
+    plt.close()
+    D1counts, D1x, D1y = plt.hist(D1holder, bins=bins)  # bins needs to be defined.
+    plt.close()
+    D2counts, D2x, D2y = plt.hist(D2holder, bins=bins)  # bins needs to be defined.
+    plt.close()
+    D3counts, D3x, D3y = plt.hist(D3holder, bins=bins)  # bins needs to be defined.
+    plt.close()
+    D4counts, D4x, D4y = plt.hist(D4holder, bins=bins)  # bins needs to be defined.
+    plt.close()
+    #
+    
+    allDataForSingleMesh = [A3counts.tolist(), D1counts.tolist(), D2counts.tolist(), D3counts.tolist(),
+                            D4counts.tolist()]
+                            merged = list(itertools.chain(*allDataForSingleMesh))
+                            # print(meshCounter)
+                            
+                            if showPlot:
+                                A3counts, A3x, A3y = plt.hist(A3holder, bins=bins)  # bins needs to be defined.
+                                    print("A3 counts", A3counts)
+                                        plt.title("angle between 3 random vertices")
+                                            plt.show()
+                                                
+                                                D1counts, D1x, D1y = plt.hist(D1holder, bins=bins)  # bins needs to be defined.
+                                                    print("D1 counts", D1counts)
+                                                        plt.title("distance between barycenter and random vertex")
+                                                            plt.show()
+                                                                
+                                                                D2counts, D2x, D2y = plt.hist(D2holder, bins=bins)  # bins needs to be defined.
+                                                                    print("D2 counts", D2counts)
+                                                                        plt.title("distance between 2 random vertices")
+                                                                            plt.show()
+                                                                                
+                                                                                D3counts, D3x, D3y = plt.hist(D3holder, bins=bins)  # bins needs to be defined.
+                                                                                    print("D3 counts", D3counts)
+                                                                                        plt.title("square root of area of triangle given by 3 random vertices")
+                                                                                            plt.show()
+                                                                                                
+                                                                                                D4counts, D4x, D4y = plt.hist(D4holder, bins=bins)  # bins needs to be defined.
+                                                                                                    print("D4 counts", D4counts)
+                                                                                                        plt.title("cube root of volume of tetrahedron formed by 4 random vertices")
+                                                                                                            plt.show()
+
+return merged
+
+
 
 
 
@@ -553,7 +549,7 @@ train = parseCla(trainPath, False)
 new = merge2dicts(test, train)  # the merged data of test and train
 
 print('----process whole benchmark----')
-path1 = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/db/0'  # the number of file is 1813, nr.1693 was removed beforehand
+path1 = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/db'  # the number of file is 1813, nr.1693 was removed beforehand
 # path1="/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/refine/1"
 stacks1, meshList1,qualifiedStack = scanDB2(path1, new,cleanMeshMode=True)
 print("the amount of prcoess of mesh : {},the amount of valid mesh : {}  ".format(len(stacks1)-1,len(meshList1)))
@@ -620,8 +616,6 @@ pd.DataFrame(combinedDataFrame).to_csv("file_benchmark_after_refinement.csv", he
 
 
 
-
-# finalMeshList=meshList1+meshList2+meshList3
 finalMeshList=meshList1+meshList2
 
 print("the amount of valid meshes",len(finalMeshList))
@@ -641,15 +635,11 @@ print("the amount of mesh after normalization:", len(newMeshList))
 
 
 #feature extraction phase
-print('---- global feature extraction phase ----')
+print('---- extraction phase ----')
 
 globalFeature = feature_extraction(finalMeshList)
 data = pd.DataFrame(data=globalFeature[1:,0:],columns=globalFeature[0,0:])
-pd.DataFrame(data).to_csv("global_feature.csv", header=True, index=False)
+pd.DataFrame(data).to_csv("all_feature.csv", header=True, index=False)
 
-print('---- shape property extraction phase ----')
-shapeProperty = shape_property(finalMeshList)
 
-data = pd.DataFrame(shapeProperty)
-pd.DataFrame(data).to_csv("shape_features.csv", header=False, index=False)
-
+#
