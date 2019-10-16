@@ -25,7 +25,7 @@ def Normalization(path):
     numOffaces = mesh.faces.shape[0]
     print('Original')
     print('Number of vertices and faces of the mesh:', numOfvertives, numOffaces)
-    print('Barycenter:', mesh.center_mass)
+    print('Barycenter:', sum(mesh.vertices)/mesh.vertices.shape[0])
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents,"\n")
     mesh.show()
 
@@ -81,12 +81,12 @@ def Normalization(path):
 
 
     print('Alignment done')
-    print('Barycenter:', mesh.center_mass)
+    print('Barycenter:', sum(mesh.vertices)/mesh.vertices.shape[0])
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents,"\n")
     mesh.show()
 
     #Flipping
-
+    center = sum(mesh.vertices)/mesh.vertices.shape[0]
     moment_lx = 0
     moment_rx = 0
     moment_ly = 0
@@ -95,26 +95,16 @@ def Normalization(path):
     moment_rz = 0
 
     for vertex in mesh.vertices:
-        if vertex[2] <= mesh.center_mass[2]:
-            moment_lz += np.linalg.norm(vertex - ori)
-        else:
-            moment_rz += np.linalg.norm(vertex - ori)
-    if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
-        transform = trimesh.geometry.align_vectors([0, 0, 1], [0, 0, -1])
-        mesh.apply_transform(transform)
-
-    for vertex in mesh.vertices:
-        if vertex[0] <= mesh.center_mass[0]:
+        if vertex[0] <= center[0]:
             moment_lx += np.linalg.norm(vertex - ori)
         else:
             moment_rx += np.linalg.norm(vertex - ori)
-    if moment_lx < moment_rx: #right side of x axis should be the moment higher side
+    if moment_lx < moment_rx:  # right side of x axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([1, 0, 0], [-1, 0, 0])
         mesh.apply_transform(transform)
 
-
     for vertex in mesh.vertices:
-        if vertex[1] <= mesh.center_mass[1]:
+        if vertex[1] <= center[1]:
             moment_ly += np.linalg.norm(vertex - ori)
         else:
             moment_ry += np.linalg.norm(vertex - ori)
@@ -122,10 +112,18 @@ def Normalization(path):
         transform = trimesh.geometry.align_vectors([0, 1, 0], [0, -1, 0])
         mesh.apply_transform(transform)
 
+    for vertex in mesh.vertices:
+        if vertex[2] <= center[2]:
+            moment_lz += np.linalg.norm(vertex - ori)
+        else:
+            moment_rz += np.linalg.norm(vertex - ori)
+    if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
+        transform = trimesh.geometry.align_vectors([0, 0, 1], [0, 0, -1])
+        mesh.apply_transform(transform)
 
 
     print('Flipping done')
-    print('Barycenter:', mesh.center_mass)
+    print('Barycenter:', sum(mesh.vertices)/mesh.vertices.shape[0])
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents)
     mesh.show()
 
@@ -135,12 +133,12 @@ def Normalization(path):
     mesh.apply_scale(1 / maxLengthOfSide)
 
     print('Scaling done')
-    print('Barycenter:', mesh.center_mass)
+    print('Barycenter:', sum(mesh.vertices)/mesh.vertices.shape[0])
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
     mesh.show()
 
 
-Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
+Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m6/m6.off')
 
 def querying(path):
     filename_list = []
@@ -151,7 +149,7 @@ def querying(path):
     new_data = pd.concat([data.iloc[:,0], norm_data], 1)
     print(new_data)
     row = new_data.shape[0]
-    Target = new_data.iloc[1785, 1:] #set target model
+    Target = new_data.iloc[1380, 1:] #set target model
 
     for i in range(row):
 
@@ -174,7 +172,8 @@ def querying(path):
         mesh.show()
 
 
-#querying("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/allfeature.csv")
+
+#querying("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/all_feature.csv")
 #mesh = trimesh.load_mesh('/Users/darkqian/PycharmProjects/MR/benchmark/db/0/m9/m9.off')
 #print(sum(mesh.vertices)/mesh.vertices.shape[0])
 #mesh.apply_translation((-0.291303,-0.210208,-0.521506))
