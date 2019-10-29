@@ -18,19 +18,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QGraphicsView, QGraphicsScene, QApplication, QMessageBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 meshlist = []
 class Figure_Canvas(FigureCanvas):
 
     # 通过继承FigureCanvas类，使得该类既是一个PyQt5的Qwidget，又是一个matplotlib的FigureCanvas，连接pyqt5与matplot
     def __init__(self, parent=None, width=6, height=2.3):
-        fig = plt.figure(figsize=(width, height), dpi=100)
+        fig = plt.figure()
         FigureCanvas.__init__(self, fig) # 初始化父类
         self.setParent(parent)
-        self.ax = fig.add_subplot(111) #调用figure下面的add_subplot方法，类似于matplotlib.pyplot下面的subplot方法
+        self.ax = fig.gca(projection='3d') #调用figure下面的add_subplot方法，类似于matplotlib.pyplot下面的subplot方法
 
-    def p1(self, Item=None, type=None):
-        Item.show()
+    def p1(self, Item):
+        self.ax.plot_surface(Item.vertices, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
 
 def Normalization(path):
     ori = [0,0,0]
