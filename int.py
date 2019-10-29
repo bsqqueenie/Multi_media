@@ -9,6 +9,7 @@ import trimesh
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
+import os
 import pandas as pd
 from pandas import Series
 import networkx as nx
@@ -16,6 +17,7 @@ from sklearn.decomposition import PCA
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QGraphicsView, QGraphicsScene, QApplication, QMessageBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 meshlist = []
 class Figure_Canvas(FigureCanvas):
@@ -148,20 +150,21 @@ def Normalization(path):
     '''
     return mesh
 
-def querying(path):
+def querying(filename):
     global meshlist
     filename_list = []
     dislist = [0]
-    data = pd.read_csv(path)
+    data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/all_feature.csv")
 
     norm_data = (data.iloc[:,1:] - data.iloc[:,1:].min()) / (data.iloc[:,1:].max() - data.iloc[:,1:].min())
 
     #norm_data = data.iloc[:,1:] / data.iloc[:,1:].max(axis=0)
     #norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
     new_data = pd.concat([data.iloc[:,0], norm_data], 1)
-    print(new_data)
+
     row = new_data.shape[0]
-    Target = new_data.iloc[1785, 1:] #set target model
+    Target = new_data.loc[new_data["fileName"]==filename] #set target model
+    Target = Target.iloc[:,1:]
 
     for i in range(row):
 
@@ -240,11 +243,13 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.pushButton.setText(_translate("MainWindow", "File select"))
 
     def openfile(self):
+        global meshlist
         _translate = QtCore.QCoreApplication.translate
         filename, filetype = QFileDialog.getOpenFileName(self, "选取文件", "./",
                                                          "OFF Files (*.off);;PLY Files (*.ply)")
-        global meshlist
-        meshlist = querying(filename)
+        [dirname, bfilename] = os.path.split(filename)
+        print(bfilename)
+        meshlist = querying(bfilename)
 
         dr = Figure_Canvas()
         dr.p1(meshlist[0])  # 画图
