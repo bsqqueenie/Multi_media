@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import filedialog
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from pandas import Series
 import networkx as nx
 from sklearn.decomposition import PCA

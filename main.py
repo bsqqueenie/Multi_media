@@ -1,5 +1,5 @@
 import sys
-from Multi_meadia.int import *
+from int import *
 from PyQt5.QtWidgets import QApplication, QMainWindow
 if __name__ == '__main__':
     app = QApplication(sys.argv)
