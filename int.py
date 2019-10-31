@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import filedialog
 import numpy as np
 import os
+from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
 from pandas import Series
 import networkx as nx
@@ -31,8 +32,15 @@ class Figure_Canvas(FigureCanvas):
         self.ax = fig.gca(projection='3d') #调用figure下面的add_subplot方法，类似于matplotlib.pyplot下面的subplot方法
 
     def p1(self, Item):
-        self.ax.plot_surface(Item.vertices, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
+        x= []
+        y=[]
+        z=[]
+        for i in Item.vertices:
+            x.append(i[0])
+            y.append(i[1])
+            z.append(i[2])
+
+        self.ax.plot_trisurf(x,y,z)
 
 def Normalization(path):
     ori = [0,0,0]
@@ -156,7 +164,7 @@ def querying(filename):
     global meshlist
     filename_list = []
     dislist = [0]
-    data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/all_feature.csv")
+    data = pd.read_csv("/Users/jack/Desktop/personalProjects/Multi_media/feature/all_feature.csv")
 
     norm_data = (data.iloc[:,1:] - data.iloc[:,1:].min()) / (data.iloc[:,1:].max() - data.iloc[:,1:].min())
 
@@ -188,7 +196,11 @@ def querying(filename):
     for j in range(5): #show meshes
         number = float(filename_list[j][1:-4])
         direname1 = number // 100
-        mesh = Normalization('/Users/darkqian/PycharmProjects/MR/benchmark/db/'+ str(int(direname1)) + '/m' + str(int(number)) +'/m' + str(int(number)) +'.off')
+
+        mesh = Normalization(
+            '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/db/' + str(
+                int(direname1)) + '/m' + str(int(number)) + '/m' + str(int(number)) + '.off')
+
         meshlist.append(mesh)
 
     return meshlist
