@@ -20,6 +20,9 @@ from PyQt5.QtWidgets import QFileDialog, QGraphicsView, QGraphicsScene, QApplica
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from stl import mesh
+from mpl_toolkits import mplot3d
+from matplotlib import pyplot
 
 meshlist = []
 class Figure_Canvas(FigureCanvas):
@@ -29,18 +32,23 @@ class Figure_Canvas(FigureCanvas):
         fig = plt.figure()
         FigureCanvas.__init__(self, fig) # 初始化父类
         self.setParent(parent)
-        self.ax = fig.gca(projection='3d') #调用figure下面的add_subplot方法，类似于matplotlib.pyplot下面的subplot方法
+        self.axes = mplot3d.Axes3D(fig) #调用figure下面的add_subplot方法，类似于matplotlib.pyplot下面的subplot方法
+
 
     def p1(self, Item):
-        x= []
-        y=[]
-        z=[]
-        for i in Item.vertices:
-            x.append(i[0])
-            y.append(i[1])
-            z.append(i[2])
 
-        self.ax.plot_trisurf(x,y,z)
+        stlFIle = trimesh.exchange.stl.export_stl(Item)
+        with open("stlFIle.stl", 'wb') as f:
+            f.write(stlFIle)
+            f.close()
+        path = 'stlFIle.stl'
+        tgtMesh = mesh.Mesh.from_file(path)
+        self.axes.add_collection3d(mplot3d.art3d.Poly3DCollection(tgtMesh.vectors))
+        scale = tgtMesh.points.flatten(-1)
+        self.axes.auto_scale_xyz(scale, scale, scale)
+
+
+
 
 def Normalization(path):
     ori = [0,0,0]
@@ -281,21 +289,21 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.graphicsView_2.setScene(graphicscene)  # 第五步，把QGraphicsScene放入QGraphicsView
         self.graphicsView_2.show()
 
-        r = Figure_Canvas()
+        dr = Figure_Canvas()
         dr.p1(meshlist[2])  # 画图
         graphicscene = QtWidgets.QGraphicsScene()
         graphicscene.addWidget(dr)  # 把图形放到QGraphicsScene中，注意：图形是作为一个QWidget放到QGraphicsScene中的
         self.graphicsView_3.setScene(graphicscene)  # 第五步，把QGraphicsScene放入QGraphicsView
         self.graphicsView_3.show()
 
-        r = Figure_Canvas()
+        dr = Figure_Canvas()
         dr.p1(meshlist[3])  # 画图
         graphicscene = QtWidgets.QGraphicsScene()
         graphicscene.addWidget(dr)  # 把图形放到QGraphicsScene中，注意：图形是作为一个QWidget放到QGraphicsScene中的
         self.graphicsView_4.setScene(graphicscene)  # 第五步，把QGraphicsScene放入QGraphicsView
         self.graphicsView_4.show()
 
-        r = Figure_Canvas()
+        dr = Figure_Canvas()
         dr.p1(meshlist[4])  # 画图
         graphicscene = QtWidgets.QGraphicsScene()
         graphicscene.addWidget(dr)  # 把图形放到QGraphicsScene中，注意：图形是作为一个QWidget放到QGraphicsScene中的
