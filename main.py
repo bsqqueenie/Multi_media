@@ -1,5 +1,5 @@
 import sys
-from int import *
+from int_new import *
 from PyQt5.QtWidgets import QApplication, QMainWindow
 if __name__ == '__main__':
     app = QApplication(sys.argv)
