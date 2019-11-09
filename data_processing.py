@@ -415,26 +415,34 @@ def cleanOffMesh(cleanOFfListPath,outPutPath,jarPath,threshold = 7000):  # this 
                 print(os.path.basename(inputpath),'vertices and faces:{},{}'.format(len(mesh_after.vertices),len(mesh_after.faces)))
 
 
-print('----process whole benchmark----')
-path1 = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/labeledDb/LabeledDB_new/Ant'  # the number of file is 1813, nr.1693 was removed beforehand
-# path1="/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/refine/1"
+# set the path
 
-stacks1, meshList1,qualifiedStack = scanDB2(path1,cleanMeshMode=True)
+# your data set path
+DSpath = 'DataSet/LabeledDB'
+# location where stores all the refined meshes
+refinedPath = 'DataSet/RefinedMeshes'
+
+print('----process whole benchmark----')
+
+
+
+stacks1, meshList1,qualifiedStack = scanDB2(DSpath,cleanMeshMode=True)
 # store the data to csv
-pd.DataFrame(stacks1).to_csv("small_before_refinement.csv", header=False, index=False)
+pd.DataFrame(stacks1).to_csv("csvFiles/small_before_refinement.csv", header=False, index=False)
 
 print('----process unqualified meshes (vertices above 7000)----')
+
 # # refine unqualified meshes, the refined meshed will be stored at the outputpath
-cleanOFfListPathtxt = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/issue_final.txt'
-path_cleanOff = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/refine/cleanoff'
-cleanOff_jar = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/cleanoff.jar'
+cleanOFfListPathtxt = 'issue_final.txt'
+path_cleanOff = refinedPath
+cleanOff_jar = 'cleanoff.jar'
 cleanOffMesh(cleanOFfListPathtxt,path_cleanOff,cleanOff_jar)
 #
 #
 #
 # # process the refined meshes
 
-path3 = '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/benchmark/refine/cleanoff'
+path3 = refinedPath
 stacks3, meshList3,_ = scanDB2(path3,cleanMeshMode=False)
 
 
@@ -453,7 +461,7 @@ print('combineedDF:', combinedDataFrame.shape)
 
 # store the refined data to csv
 
-pd.DataFrame(combinedDataFrame).to_csv("small_after_refinement.csv", header=True, index=False)
+pd.DataFrame(combinedDataFrame).to_csv("csvFiles/small_after_refinement.csv", header=True, index=False)
 
 finalMeshList=meshList1+meshList3
 
@@ -478,7 +486,7 @@ data=pd.DataFrame(feature,columns=header)
 
 
 
-path2 = 'small_before_refinement.csv'
+path2 = 'csvFiles/small_before_refinement.csv'
 
 all_feature = data
 class_table = pd.read_csv(path2)
@@ -490,6 +498,6 @@ for i in all_feature['fileName']:
     className.append(class_table.loc[class_table['fileName'] == i].iloc[:,0].values[0])
 
 all_feature.insert(loc=0, column="className", value=className)
-pd.DataFrame(all_feature).to_csv("LPSB_features_final.csv", header=True, index=False)
+pd.DataFrame(all_feature).to_csv("csvFiles/LPSB_features_final.csv", header=True, index=False)
 
 

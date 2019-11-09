@@ -1,0 +1,14 @@
+DataSet/LabeledDB/Ant/95.off
+DataSet/LabeledDB/Ant/94.off
+DataSet/LabeledDB/Ant/82.off
+DataSet/LabeledDB/Ant/96.off
+DataSet/LabeledDB/Ant/97.off
+DataSet/LabeledDB/Ant/87.off
+DataSet/LabeledDB/Ant/93.off
+DataSet/LabeledDB/Ant/86.off
+DataSet/LabeledDB/Ant/90.off
+DataSet/LabeledDB/Ant/85.off
+DataSet/LabeledDB/Ant/91.off
+DataSet/LabeledDB/Ant/88.off
+DataSet/LabeledDB/Ant/89.off
+DataSet/LabeledDB/Ant/100.off
