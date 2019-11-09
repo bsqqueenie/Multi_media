@@ -72,11 +72,11 @@ def Normalization(path):
     Reduced_mesh = pca.fit_transform(mesh.vertices)
     #print(pca.components_)
 
-    transform_x = trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0])
+    transform_x = trimesh.geometry.align_vectors(pca.components_[0], [0, -1, 0])
     mesh.apply_transform(transform_x)
     Reduced_mesh_newx = pca.fit_transform(mesh.vertices)
 
-    transform_y = trimesh.geometry.align_vectors(pca.components_[1], [0, 1, 0])
+    transform_y = trimesh.geometry.align_vectors(pca.components_[1], [1, 0, 0])
     mesh.apply_transform(transform_y)
     Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
     #print(pca.components_)
@@ -104,14 +104,7 @@ def Normalization(path):
         transform = trimesh.geometry.align_vectors([-1, 0, 0], [1, 0, 0])
         mesh.apply_transform(transform)
 
-    for vertex in mesh.vertices:
-        if vertex[1] <= center[1]:
-            moment_ly += np.linalg.norm(vertex - ori)
-        else:
-            moment_ry += np.linalg.norm(vertex - ori)
-    if moment_ly < moment_ry:  # right side of y axis should be the moment higher side
-        transform = trimesh.geometry.align_vectors([0, -1, 0], [0, 1, 0])
-        mesh.apply_transform(transform)
+
 
     for vertex in mesh.vertices:
         if vertex[2] <= center[2]:
@@ -120,6 +113,15 @@ def Normalization(path):
             moment_rz += np.linalg.norm(vertex - ori)
     if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([0, 0, -1], [0, 0, 1])
+        mesh.apply_transform(transform)
+
+    for vertex in mesh.vertices:
+        if vertex[1] <= center[1]:
+            moment_ly += np.linalg.norm(vertex - ori)
+        else:
+            moment_ry += np.linalg.norm(vertex - ori)
+    if moment_ly < moment_ry:  # right side of y axis should be the moment higher side
+        transform = trimesh.geometry.align_vectors([0, -1, 0], [0, 1, 0])
         mesh.apply_transform(transform)
     '''
     print('Flipping done')
@@ -142,9 +144,10 @@ def Normalization(path):
 def querying(filename):
 
     global meshlist, Dis_list
+    Dis_list = []
     filename_list = []
     dislist = [0]
-    data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/all_feature_small.csv")
+    data = pd.read_csv("/Users/jack/Desktop/personalProjects/Multi_media/feature/features_final.csv")
 
     norm_data = (data.iloc[:,2:] - data.iloc[:,2:].min()) / (data.iloc[:,2:].max() - data.iloc[:,2:].min())
 
@@ -152,12 +155,11 @@ def querying(filename):
     #norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
     new_data = pd.concat([data.iloc[:,0:2], norm_data], 1)
     row = new_data.shape[0]
+    print(new_data.head(10))
     Target = new_data.loc[new_data["fileName"]==filename] #set target model
 
     Target_global = Target.iloc[:,2:7]
     Target_h1 = Target.iloc[:,7:15].apply(lambda x: x/8 )
-    print(Target_global)
-    print(Target_h1)
     Target_h2 = Target.iloc[:,15:23].apply(lambda x: x/8 )
     Target_h3 = Target.iloc[:,23:31].apply(lambda x: x/8 )
     Target_h4 = Target.iloc[:,31:39].apply(lambda x: x/8 )
@@ -171,11 +173,11 @@ def querying(filename):
         Com_h4 = new_data.iloc[i, 31:39].apply(lambda x: x/8 )
         Com_h5 = new_data.iloc[i, 39:47].apply(lambda x: x/8)
 
-        Dis_h1 = scipy.stats.wasserstein_distance(Target_h1.values[0], Com_h1.values) #Earth mover's distance
-        Dis_h2 = scipy.stats.wasserstein_distance(Target_h2.values[0], Com_h2.values)
-        Dis_h3 = scipy.stats.wasserstein_distance(Target_h3.values[0], Com_h3.values)
-        Dis_h4 = scipy.stats.wasserstein_distance(Target_h4.values[0], Com_h4.values)
-        Dis_h5 = scipy.stats.wasserstein_distance(Target_h5.values[0], Com_h5.values)
+        Dis_h1 = scipy.spatial.distance.cosine(Target_h1.values[0], Com_h1.values) #Earth mover's distance
+        Dis_h2 = scipy.spatial.distance.cosine(Target_h2.values[0], Com_h2.values)
+        Dis_h3 = scipy.spatial.distance.cosine(Target_h3.values[0], Com_h3.values)
+        Dis_h4 = scipy.spatial.distance.cosine(Target_h4.values[0], Com_h4.values)
+        Dis_h5 = scipy.spatial.distance.cosine(Target_h5.values[0], Com_h5.values)
 
         Dis_global = np.linalg.norm(Target_global - Com_global) # Euclidean distance
         Dis = (Dis_h1 + Dis_h2 +Dis_h3 + Dis_h4 + Dis_h5 + Dis_global)/6
@@ -196,7 +198,8 @@ def querying(filename):
         Dis = file.iloc[:,0].values[0]
         Dis_list.append(Dis)
         mesh = Normalization(
-            '/Users/darkqian/PycharmProjects/MR/LabeledDB' + '/' + str(direname1) + '/' + str(int(number)) + '.off')
+            '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/LabeledDB/LabeledDB_new' + '/' + str(
+                direname1) + '/' + str(int(number)) + '.off')
 
         meshlist.append(mesh)
     print(Dis_list)
@@ -339,11 +342,11 @@ class Ui_MainWindow(QtWidgets.QWidget):
 
     def t_SNE(self):
         # load the feature
-        path = '/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/small_all_feature.csv'
+        path = '/Users/jack/Desktop/personalProjects/Multi_media/feature/small_all_feature.csv'
         data = pd.read_csv(path)
 
         # load the labels and binarize the labels
-        path2 = '/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/small_before_refinement.csv'
+        path2 = '/Users/jack/Desktop/personalProjects/Multi_media/feature/small_before_refinement.csv'
         data2 = pd.read_csv(path2)
         classList = []
         for i in data.iloc[:, 0]:
@@ -402,7 +405,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
             #   print(new_labels)
             feature = (csvData.iloc[:, 1:] - csvData.iloc[:, 1:].min()) / (
                         csvData.iloc[:, 1:].max() - csvData.iloc[:, 1:].min())
-            features_embedded = TSNE(n_components=2).fit_transform(feature)
+            features_embedded = TSNE(n_components=2,perplexity=10).fit_transform(feature)
             return features_embedded, new_labels
 
         features_embedded, labelsIndex = T_SNE(data, labels)
@@ -446,7 +449,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
                         fig.canvas.draw_idle()
 
         fig.canvas.mpl_connect("motion_notify_event", hover)
-        plt.colorbar(ticks=range(53))
+        # plt.colorbar(ticks=range(53))
         plt.rcParams["figure.figsize"] = 10, 10
         plt.show()
 
