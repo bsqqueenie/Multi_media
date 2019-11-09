@@ -139,6 +139,14 @@ def Normalization(path):
         mesh.apply_transform(transform)
 
 
+    for vertex in mesh.vertices:
+        if vertex[1] <= center[1]:
+            moment_ly += np.linalg.norm(vertex - ori)
+        else:
+            moment_ry += np.linalg.norm(vertex - ori)
+    if moment_ly < moment_ry:  # right side of y axis should be the moment higher side
+        transform = trimesh.geometry.align_vectors([0, -1, 0], [0, 1, 0])
+        mesh.apply_transform(transform)
 
     '''
     print('Flipping done')
@@ -161,9 +169,14 @@ def Normalization(path):
 def querying(filename):
 
     global meshlist, Dis_list
+    Dis_list = []
     filename_list = []
     dislist = [0]
+
     data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/features_final.csv")
+
+    data = pd.read_csv("/Users/jack/Desktop/personalProjects/Multi_media/feature/features_final.csv")
+
 
     norm_data = (data.iloc[:,2:] - data.iloc[:,2:].min()) / (data.iloc[:,2:].max() - data.iloc[:,2:].min())
 
@@ -214,7 +227,8 @@ def querying(filename):
         Dis = file.iloc[:,0].values[0]
         Dis_list.append(Dis)
         mesh = Normalization(
-            '/Users/darkqian/PycharmProjects/MR/LabeledDB' + '/' + str(direname1) + '/' + str(int(number)) + '.off')
+            '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/LabeledDB/LabeledDB_new' + '/' + str(
+                direname1) + '/' + str(int(number)) + '.off')
 
         meshlist.append(mesh)
     print(Dis_list)
@@ -357,11 +371,11 @@ class Ui_MainWindow(QtWidgets.QWidget):
 
     def t_SNE(self):
         # load the feature
-        path = '/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/small_all_feature.csv'
+        path = '/Users/jack/Desktop/personalProjects/Multi_media/feature/small_all_feature.csv'
         data = pd.read_csv(path)
 
         # load the labels and binarize the labels
-        path2 = '/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/small_before_refinement.csv'
+        path2 = '/Users/jack/Desktop/personalProjects/Multi_media/feature/small_before_refinement.csv'
         data2 = pd.read_csv(path2)
         classList = []
         for i in data.iloc[:, 0]:
@@ -420,7 +434,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
             #   print(new_labels)
             feature = (csvData.iloc[:, 1:] - csvData.iloc[:, 1:].min()) / (
                         csvData.iloc[:, 1:].max() - csvData.iloc[:, 1:].min())
-            features_embedded = TSNE(n_components=2).fit_transform(feature)
+            features_embedded = TSNE(n_components=2,perplexity=10).fit_transform(feature)
             return features_embedded, new_labels
 
         features_embedded, labelsIndex = T_SNE(data, labels)
@@ -464,7 +478,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
                         fig.canvas.draw_idle()
 
         fig.canvas.mpl_connect("motion_notify_event", hover)
-        plt.colorbar(ticks=range(53))
+        # plt.colorbar(ticks=range(53))
         plt.rcParams["figure.figsize"] = 10, 10
         plt.show()
 
