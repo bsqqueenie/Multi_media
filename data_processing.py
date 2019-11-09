@@ -59,7 +59,7 @@ def scanDB2(path, cleanMeshMode=True,
                         txt1.write(filePath + ' ' + "new_error")
                         txt1.write('\n')
 
-                    # print(count)
+                    print(count)
                     count = count + 1
 
     return stacks, meshList, qualifiedStack
@@ -181,7 +181,7 @@ def normalization(meshList):
 
 
         newMeshList.append([each[0],mesh]) # store filename and mesh object
-        # print(count)
+        print(count)
         count = count + 1
 
     return newMeshList
@@ -410,6 +410,7 @@ def angle(randomPoint1, vertex, randomPoint2):  # calculate the angle given 3 3d
 def cleanOffMesh(cleanOFfListPath,outPutPath,jarPath,threshold = 7000):  # this function is for those meshes that have less than 100 faces and vertices
     txt=open(cleanOFfListPath,'r')
     distance = 0.005
+    refineFilePath = None
     for eachPath in txt.readlines():
         inputpath = eachPath.strip('\n')
         refineFilePath = os.path.join(outPutPath,os.path.basename(inputpath))
@@ -438,7 +439,7 @@ def cleanOffMesh(cleanOFfListPath,outPutPath,jarPath,threshold = 7000):  # this 
 # set the path
 
 # your data set path
-DSpath = 'DataSet/LabeledDB/Ant'
+DSpath = 'DataSet/LabeledDB'
 # location where stores all the refined meshes
 refinedPath = 'DataSet/RefinedMeshes'
 cleanOff_jar = 'cleanoff.jar'
@@ -461,8 +462,7 @@ def readNewMesh(path, max=7000):  # input the root paht, not enter the path for 
         nomalizedMesh = normalization([[os.path.basename(path), mesh]])
         featureStacks, columnsName = feature_extraction(nomalizedMesh)
     # print(featureStacks)
-    return featureStacks
-
+    return featureStacks[0][1:]
 
 
 
@@ -554,5 +554,7 @@ pd.DataFrame(all_feature).to_csv("csvFiles/LPSB_features_final.csv", header=True
 
 
 
-
-
+#
+#
+# path = '/Users/jack/Desktop/personalProjects/Multi_media/DataSet/LabeledDB/Ant/81.off'
+# print(readNewMesh(path))

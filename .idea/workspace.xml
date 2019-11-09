@@ -2,10 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="44f049a1-6cf3-4e11-b796-b754df0557ae" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/cleanoff.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/csvFiles/LPSB_features_final.csv" beforeDir="false" afterPath="$PROJECT_DIR$/csvFiles/LPSB_features_final.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/csvFiles/small_after_refinement.csv" beforeDir="false" afterPath="$PROJECT_DIR$/csvFiles/small_after_refinement.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/csvFiles/small_before_refinement.csv" beforeDir="false" afterPath="$PROJECT_DIR$/csvFiles/small_before_refinement.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/int_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/int_new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/issue_final.txt" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,44 +17,48 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/Multi_media$main.coverage" NAME="main Coverage Results" MODIFIED="1573300049918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Multi_media$data_processing.coverage" NAME="data_processing Coverage Results" MODIFIED="1573300401873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Multi_media$main.coverage" NAME="main Coverage Results" MODIFIED="1573309543078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Multi_media$int_new.coverage" NAME="int_new Coverage Results" MODIFIED="1573308696341" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Multi_media$data_processing.coverage" NAME="data_processing Coverage Results" MODIFIED="1573309652800" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Multi_media$test_visualization.coverage" NAME="test_visualization Coverage Results" MODIFIED="1573308321229" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="430786354">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
           <entry key="project.closed" value="23" />
-          <entry key="project.open.time.0" value="12" />
+          <entry key="project.open.time.0" value="13" />
           <entry key="project.open.time.1" value="6" />
           <entry key="project.open.time.3" value="2" />
           <entry key="project.open.time.5" value="2" />
           <entry key="project.open.time.6" value="1" />
-          <entry key="project.opened" value="23" />
+          <entry key="project.opened" value="24" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="csv" value="6" />
-          <entry key="py" value="6" />
+          <entry key="csv" value="8" />
+          <entry key="py" value="7" />
           <entry key="txt" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CSV" value="6" />
+          <entry key="CSV" value="8" />
           <entry key="PLAIN_TEXT" value="1" />
-          <entry key="Python" value="6" />
+          <entry key="Python" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="374" />
+          <entry key="csv" value="25" />
+          <entry key="py" value="562" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="374" />
+          <entry key="CSV" value="25" />
+          <entry key="Python" value="562" />
         </counts>
       </usages-collector>
     </session>
@@ -61,20 +68,21 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/int_new.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6075">
-              <caret line="405" column="75" selection-start-line="405" selection-start-column="75" selection-end-line="405" selection-end-column="75" />
+            <state relative-caret-position="-692">
+              <caret line="384" column="41" selection-start-line="384" selection-start-column="27" selection-end-line="384" selection-end-column="41" />
               <folding>
                 <element signature="e#191#205#0" expanded="true" />
+                <element signature="e#16715#17922#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_processing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="107">
-              <caret line="419" column="20" lean-forward="true" selection-start-line="419" selection-start-column="20" selection-end-line="419" selection-end-column="20" />
+            <state relative-caret-position="-412">
+              <caret line="412" column="25" selection-start-line="412" selection-start-column="25" selection-end-line="412" selection-end-column="25" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -83,8 +91,40 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test_visualization.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="760">
+              <caret line="89" column="42" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="42" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/csvFiles/small_before_refinement.csv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret selection-end-line="4" selection-end-column="53" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/csvFiles/features_final.csv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2048" />
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/csvFiles/LPSB_features_final.csv">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="330">
+              <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -110,6 +150,17 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>m1</find>
+      <find>csvData</find>
+      <find>T_SNE</find>
+      <find>label</find>
+      <find>data</find>
+      <find>labels</find>
+      <find>labelsIndex</find>
+      <find>count</find>
+      <find>LabelBinarizer</find>
+      <find>readNewMesh</find>
+      <find>refineMeshPath</find>
+      <find>cleanOffMesh</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -120,7 +171,10 @@
       <list>
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/int.py" />
+        <option value="$PROJECT_DIR$/test_visualization.py" />
         <option value="$PROJECT_DIR$/int_new.py" />
+        <option value="$PROJECT_DIR$/csvFiles/LPSB_features_final.csv" />
+        <option value="$PROJECT_DIR$/csvFiles/small_before_refinement.csv" />
         <option value="$PROJECT_DIR$/data_processing.py" />
       </list>
     </option>
@@ -213,6 +267,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="int_new" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Multi_media" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/int_new.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Multi_media" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -235,14 +311,40 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test_visualization" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Multi_media" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_visualization.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.main" />
       <item itemvalue="Python.data_processing" />
+      <item itemvalue="Python.test_visualization" />
+      <item itemvalue="Python.int_new" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.data_processing" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.int_new" />
+        <item itemvalue="Python.test_visualization" />
       </list>
     </recent_temporary>
   </component>
@@ -263,12 +365,12 @@
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.33619457" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17381974" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.3299363" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.49171975" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.08535032" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -310,19 +412,6 @@
     <entry file="file://$PROJECT_DIR$/issue_final.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/int_new.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6075">
-          <caret line="405" column="75" selection-start-line="405" selection-start-column="75" selection-end-line="405" selection-end-column="75" />
-          <folding>
-            <element signature="e#191#205#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/csvFiles/LPSB_features_final.csv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/matplotlib/projections/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="855">
@@ -337,13 +426,53 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/csvFiles/features_final.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2048" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_visualization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="760">
+          <caret line="89" column="42" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/int_new.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-692">
+          <caret line="384" column="41" selection-start-line="384" selection-start-column="27" selection-end-line="384" selection-end-column="41" />
+          <folding>
+            <element signature="e#191#205#0" expanded="true" />
+            <element signature="e#16715#17922#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="107">
-          <caret line="419" column="20" lean-forward="true" selection-start-line="419" selection-start-column="20" selection-end-line="419" selection-end-column="20" />
+        <state relative-caret-position="-412">
+          <caret line="412" column="25" selection-start-line="412" selection-start-column="25" selection-end-line="412" selection-end-column="25" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/csvFiles/LPSB_features_final.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/csvFiles/small_before_refinement.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="4" selection-end-column="53" />
         </state>
       </provider>
     </entry>

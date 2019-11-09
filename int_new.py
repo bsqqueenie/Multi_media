@@ -227,7 +227,7 @@ def querying(filename, direname):
         Dis = file.iloc[:, 0].values[0]
         Dis_list.append(Dis)
         mesh = Normalization(
-            'LabeledDB/' + '/' + str(
+            'DataSet/LabeledDB/' + '/' + str(
                 direname1) + '/' + str(int(number)) + '.off')
 
         meshlist.append(mesh)
@@ -373,23 +373,19 @@ class Ui_MainWindow(QtWidgets.QWidget):
 
     def t_SNE(self):
         # load the feature
-        path = 'csvFiles/features_final.csv'
-        data = pd.read_csv(path)
+        path = 'csvFiles/LPSB_features_final.csv'
+        data = pd.read_csv(path).iloc[:,1:]
 
-        # # load the labels and binarize the labels
-        # path2 = 'csvFiles/small_before_refinement.csv'
-        # data2 = pd.read_csv(path2)
-        # classList = []
-        # for i in data.iloc[:, 0]:
-        #     className = data2.loc[data2['fileName'] == i].iloc[0, 0]
-        #     classList.append(className)
-
-        classList = data["className"].values
-
+        # load the labels and binarize the labels
+        path2 = 'csvFiles/small_before_refinement.csv'
+        data2 = pd.read_csv(path2)
+        classList = []
+        for i in pd.read_csv(path)['className'].values:
+            classList.append(i)
         lb = preprocessing.LabelBinarizer()
         lb.fit(classList)
         labels = lb.transform(classList)
-
+        print(labels)
         # print(feature.shape)
         # print(labels)
 
