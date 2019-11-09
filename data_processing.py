@@ -59,7 +59,7 @@ def scanDB2(path, cleanMeshMode=True,
                         txt1.write(filePath + ' ' + "new_error")
                         txt1.write('\n')
 
-                    print(count)
+                    # print(count)
                     count = count + 1
 
     return stacks, meshList, qualifiedStack
@@ -90,6 +90,7 @@ def normalization(meshList):
         center = sum(mesh.vertices) / mesh.vertices.shape[0]
         Dis = np.linalg.norm(center - ori)
 
+
         while (Dis >= 0.05):
             mesh.apply_translation(ori - center)  # move the mesh to the originz
             center = sum(mesh.vertices) / mesh.vertices.shape[0]
@@ -100,17 +101,23 @@ def normalization(meshList):
 
         # Alignment
 
-        pca = PCA(n_components=2)
+        pca = PCA(n_components=3)
         Reduced_mesh = pca.fit_transform(mesh.vertices)
-
-
-        transform_x = trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0])
+        # print(pca.components_)
+        a = trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0], return_angle=True)
+        b = trimesh.geometry.align_vectors(pca.components_[0], [-1, 0, 0], return_angle=True)
+        transform_x = (trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0]) if a[1] <= b[
+            1] else trimesh.geometry.align_vectors(pca.components_[0], [-1, 0, 0]))
         mesh.apply_transform(transform_x)
         Reduced_mesh_newx = pca.fit_transform(mesh.vertices)
+        c = trimesh.geometry.align_vectors(pca.components_[0], [0, 1, 0], return_angle=True)
+        d = trimesh.geometry.align_vectors(pca.components_[0], [0, -1, 0], return_angle=True)
 
-        transform_y = trimesh.geometry.align_vectors(pca.components_[1], [0, 1, 0])
+        transform_y = (trimesh.geometry.align_vectors(pca.components_[0], [0, 1, 0]) if c[1] <= d[
+            1] else trimesh.geometry.align_vectors(pca.components_[0], [0, -1, 0]))
         mesh.apply_transform(transform_y)
         Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
+
 
 
 
@@ -123,14 +130,37 @@ def normalization(meshList):
         moment_ry = 0
         moment_lz = 0
         moment_rz = 0
+        thread = [0, 0, 1]
 
         for vertex in mesh.vertices:
-            if vertex[0] <= center[0]:
-                moment_lx += np.linalg.norm(vertex - ori)
+            a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
+            if vertex[0] <= 0:
+                moment_lx += np.linalg.norm(vertex - center) * math.sin(a[1])
             else:
-                moment_rx += np.linalg.norm(vertex - ori)
-        if moment_lx < moment_rx:  # right side of x axis should be the moment higher side
-            transform = trimesh.geometry.align_vectors([1, 0, 0], [-1, 0, 0])
+                moment_rx += np.linalg.norm(vertex - center) * math.sin(a[1])
+        if moment_lx < moment_rx:  # left side of x axis should be the moment higher side
+            transform = trimesh.geometry.align_vectors([-1, 0, 0], [1, 0, 0])
+            mesh.apply_transform(transform)
+
+        for vertex in mesh.vertices:
+            a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
+            if vertex[1] <= 0:
+                moment_ly += np.linalg.norm(vertex - center) * math.sin(a[1])
+            else:
+                moment_ry += np.linalg.norm(vertex - center) * math.sin(a[1])
+        if moment_ly < moment_ry:  # left side of y axis should be the moment higher side
+            transform = trimesh.geometry.align_vectors([0, -1, 0], [0, 1, 0])
+            mesh.apply_transform(transform)
+
+        for vertex in mesh.vertices:
+            a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
+            if vertex[2] <= 0:
+                moment_lz += np.linalg.norm(vertex - center) * math.sin(a[1])
+            else:
+                moment_rz += np.linalg.norm(vertex - center) * math.sin(a[1])
+
+        if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
+            transform = trimesh.geometry.align_vectors([0, 0, -1], [0, 0, 1])
             mesh.apply_transform(transform)
 
         for vertex in mesh.vertices:
@@ -139,19 +169,8 @@ def normalization(meshList):
             else:
                 moment_ry += np.linalg.norm(vertex - ori)
         if moment_ly < moment_ry:  # right side of y axis should be the moment higher side
-            transform = trimesh.geometry.align_vectors([0, 1, 0], [0, -1, 0])
+            transform = trimesh.geometry.align_vectors([0, -1, 0], [0, 1, 0])
             mesh.apply_transform(transform)
-
-        for vertex in mesh.vertices:
-            if vertex[2] <= center[2]:
-                moment_lz += np.linalg.norm(vertex - ori)
-            else:
-                moment_rz += np.linalg.norm(vertex - ori)
-        if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
-            transform = trimesh.geometry.align_vectors([0, 0, 1], [0, 0, -1])
-            mesh.apply_transform(transform)
-
-
 
         # Scaling
 
@@ -162,7 +181,7 @@ def normalization(meshList):
 
 
         newMeshList.append([each[0],mesh]) # store filename and mesh object
-        print(count)
+        # print(count)
         count = count + 1
 
     return newMeshList
@@ -218,7 +237,7 @@ def feature_extraction(meshList): # 传入 normalize 过后的mesh
             shape_property(mesh, 8, False)
             final = featureofEachMesh + shape_property(mesh,8,False)
             featureStacks.append(final)
-            print(counter)
+            # print(counter)
             counter = counter + 1
         except:
             print(each[0], "error with this file")
@@ -397,33 +416,62 @@ def cleanOffMesh(cleanOFfListPath,outPutPath,jarPath,threshold = 7000):  # this 
         subprocess.call(['java', '-jar', jarPath, inputpath, refineFilePath, str(distance)])
         mesh_after = trimesh.load_mesh(refineFilePath)
         mesh_after.remove_duplicate_faces()
-        print(os.path.basename(inputpath), 'vertices and faces:{},{}'.format(len(mesh_after.vertices), len(mesh_after.faces)))
+
+        # print(os.path.basename(inputpath), 'vertices and faces:{},{}'.format(len(mesh_after.vertices), len(mesh_after.faces)))
         while mesh_after.vertices.shape[0] < 1000 or  mesh_after.faces.shape[0] < 1000:
-                print("invalid processing, going back to original mesh")
+                # print("invalid processing, going back to original mesh")
                 distance = distance - 0.001
                 subprocess.call(['java', '-jar', jarPath, inputpath, refineFilePath, str(distance)])
                 mesh_after = trimesh.load_mesh(refineFilePath)
                 mesh_after.remove_duplicate_faces()
-                print(os.path.basename(inputpath),'vertices and faces:{},{}'.format(len(mesh_after.vertices),len(mesh_after.faces)))
+                # print(os.path.basename(inputpath),'vertices and faces:{},{}'.format(len(mesh_after.vertices),len(mesh_after.faces)))
 
         while mesh_after.vertices.shape[0] > threshold and  mesh_after.faces.shape[0] > threshold:
-                print("entering looping for cleaningoff")
+                # print("entering looping for cleaningoff")
                 subprocess.call(['java', '-jar', jarPath, refineFilePath, refineFilePath, str(distance)])
                 distance = distance + 0.001
                 mesh_after = trimesh.load_mesh(refineFilePath)
                 mesh_after.remove_duplicate_faces()
-                print(os.path.basename(inputpath),'vertices and faces:{},{}'.format(len(mesh_after.vertices),len(mesh_after.faces)))
-
+                # print(os.path.basename(inputpath),'vertices and faces:{},{}'.format(len(mesh_after.vertices),len(mesh_after.faces)))
+    return refineFilePath
 
 # set the path
 
 # your data set path
-DSpath = 'DataSet/LabeledDB'
+DSpath = 'DataSet/LabeledDB/Ant'
 # location where stores all the refined meshes
 refinedPath = 'DataSet/RefinedMeshes'
+cleanOff_jar = 'cleanoff.jar'
+cleanMesh= 'refined_mesh.txt'
+
+def readNewMesh(path, max=7000):  # input the root paht, not enter the path for one specific file
+
+    mesh = trimesh.load_mesh(path)
+    mesh.remove_duplicate_faces()
+
+    if Meshfilter(mesh)[0] <= max:
+        nomalizedMesh = normalization([[os.path.basename(path), mesh]])
+        featureStacks, columnsName = feature_extraction(nomalizedMesh)
+
+    if Meshfilter(mesh)[0] > max:
+        with open(cleanMesh, 'w') as txt1:
+            txt1.write(path)
+        refineMeshPath = cleanOffMesh(cleanMesh, refinedPath, cleanOff_jar)
+        mesh  = trimesh.load_mesh(refineMeshPath)
+        nomalizedMesh = normalization([[os.path.basename(path), mesh]])
+        featureStacks, columnsName = feature_extraction(nomalizedMesh)
+    # print(featureStacks)
+    return featureStacks
+
+
+
+
+
+
+
+
 
 print('----process whole benchmark----')
-
 
 
 stacks1, meshList1,qualifiedStack = scanDB2(DSpath,cleanMeshMode=True)
@@ -499,5 +547,12 @@ for i in all_feature['fileName']:
 
 all_feature.insert(loc=0, column="className", value=className)
 pd.DataFrame(all_feature).to_csv("csvFiles/LPSB_features_final.csv", header=True, index=False)
+
+
+
+
+
+
+
 
 

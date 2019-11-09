@@ -19,11 +19,13 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from sklearn import preprocessing
 import scipy
+
 meshlist = []
 Dis_list = []
 
+
 def Normalization(path):
-    ori= [0,0,0]
+    ori = [0, 0, 0]
     try:
         mesh = trimesh.load_mesh(path)
     except:
@@ -72,13 +74,18 @@ def Normalization(path):
 
     pca = PCA(n_components=3)
     Reduced_mesh = pca.fit_transform(mesh.vertices)
-    #print(pca.components_)
-
-    transform_x = trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0])
+    # print(pca.components_)
+    a = trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0], return_angle=True)
+    b = trimesh.geometry.align_vectors(pca.components_[0], [-1, 0, 0], return_angle=True)
+    transform_x = (trimesh.geometry.align_vectors(pca.components_[0], [1, 0, 0]) if a[1] <= b[
+        1] else trimesh.geometry.align_vectors(pca.components_[0], [-1, 0, 0]))
     mesh.apply_transform(transform_x)
     Reduced_mesh_newx = pca.fit_transform(mesh.vertices)
+    c = trimesh.geometry.align_vectors(pca.components_[0], [0, 1, 0], return_angle=True)
+    d = trimesh.geometry.align_vectors(pca.components_[0], [0, -1, 0], return_angle=True)
 
-    transform_y = trimesh.geometry.align_vectors(pca.components_[1], [0, 1, 0])
+    transform_y = (trimesh.geometry.align_vectors(pca.components_[0], [0, 1, 0]) if c[1] <= d[
+        1] else trimesh.geometry.align_vectors(pca.components_[0], [0, -1, 0]))
     mesh.apply_transform(transform_y)
     Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
 
@@ -87,8 +94,6 @@ def Normalization(path):
     mesh.apply_transform(transform_z)
     Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
     '''
-
-    print(pca.components_)
 
     '''
     print('Alignment done')
@@ -106,13 +111,13 @@ def Normalization(path):
     moment_lz = 0
     moment_rz = 0
     thread = [0, 0, 1]
-    
+
     for vertex in mesh.vertices:
         a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
         if vertex[0] <= 0:
-            moment_lx += np.linalg.norm(vertex - center)*math.sin(a[1])
+            moment_lx += np.linalg.norm(vertex - center) * math.sin(a[1])
         else:
-            moment_rx += np.linalg.norm(vertex - center)*math.sin(a[1])
+            moment_rx += np.linalg.norm(vertex - center) * math.sin(a[1])
     if moment_lx < moment_rx:  # left side of x axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([-1, 0, 0], [1, 0, 0])
         mesh.apply_transform(transform)
@@ -137,7 +142,6 @@ def Normalization(path):
     if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([0, 0, -1], [0, 0, 1])
         mesh.apply_transform(transform)
-
 
     for vertex in mesh.vertices:
         if vertex[1] <= center[1]:
@@ -166,73 +170,70 @@ def Normalization(path):
     '''
     return mesh
 
-def querying(filename):
 
+def querying(filename, direname):
     global meshlist, Dis_list
     Dis_list = []
     filename_list = []
     dislist = [0]
 
-    data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/features_final.csv")
+    data = pd.read_csv("csvFiles/features_final.csv")
 
-    data = pd.read_csv("/Users/jack/Desktop/personalProjects/Multi_media/feature/features_final.csv")
+    norm_data = (data.iloc[:, 2:] - data.iloc[:, 2:].min()) / (data.iloc[:, 2:].max() - data.iloc[:, 2:].min())
 
-
-    norm_data = (data.iloc[:,2:] - data.iloc[:,2:].min()) / (data.iloc[:,2:].max() - data.iloc[:,2:].min())
-
-    #norm_data = data.iloc[:,1:] / data.iloc[:,1:].max(axis=0)
-    #norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
-    new_data = pd.concat([data.iloc[:,0:2], norm_data], 1)
+    # norm_data = data.iloc[:,1:] / data.iloc[:,1:].max(axis=0)
+    # norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
+    new_data = pd.concat([data.iloc[:, 0:2], norm_data], 1)
     row = new_data.shape[0]
     print(new_data.head(10))
-    Target = new_data.loc[new_data["fileName"]==filename] #set target model
+    Target = new_data.loc[new_data["fileName"] == filename]  # set target model
 
-    Target_global = Target.iloc[:,2:7]
-    Target_h1 = Target.iloc[:,7:15].apply(lambda x: x/8 )
-    Target_h2 = Target.iloc[:,15:23].apply(lambda x: x/8 )
-    Target_h3 = Target.iloc[:,23:31].apply(lambda x: x/8 )
-    Target_h4 = Target.iloc[:,31:39].apply(lambda x: x/8 )
-    Target_h5 = Target.iloc[:,39:47].apply(lambda x: x/8 )
+    Target_global = Target.iloc[:, 2:7]
+    Target_h1 = Target.iloc[:, 7:15].apply(lambda x: x / 8)
+    Target_h2 = Target.iloc[:, 15:23].apply(lambda x: x / 8)
+    Target_h3 = Target.iloc[:, 23:31].apply(lambda x: x / 8)
+    Target_h4 = Target.iloc[:, 31:39].apply(lambda x: x / 8)
+    Target_h5 = Target.iloc[:, 39:47].apply(lambda x: x / 8)
     for i in range(row):
-
         Com_global = new_data.iloc[i, 2:7]
-        Com_h1 = new_data.iloc[i, 7:15].apply(lambda x: x/8 )
-        Com_h2 = new_data.iloc[i, 15:23].apply(lambda x: x/8 )
-        Com_h3 = new_data.iloc[i, 23:31].apply(lambda x: x/8 )
-        Com_h4 = new_data.iloc[i, 31:39].apply(lambda x: x/8 )
-        Com_h5 = new_data.iloc[i, 39:47].apply(lambda x: x/8)
+        Com_h1 = new_data.iloc[i, 7:15].apply(lambda x: x / 8)
+        Com_h2 = new_data.iloc[i, 15:23].apply(lambda x: x / 8)
+        Com_h3 = new_data.iloc[i, 23:31].apply(lambda x: x / 8)
+        Com_h4 = new_data.iloc[i, 31:39].apply(lambda x: x / 8)
+        Com_h5 = new_data.iloc[i, 39:47].apply(lambda x: x / 8)
 
-        Dis_h1 = scipy.spatial.distance.cosine(Target_h1.values[0], Com_h1.values) #Earth mover's distance
+        Dis_h1 = scipy.spatial.distance.cosine(Target_h1.values[0], Com_h1.values)  # Earth mover's distance
         Dis_h2 = scipy.spatial.distance.cosine(Target_h2.values[0], Com_h2.values)
         Dis_h3 = scipy.spatial.distance.cosine(Target_h3.values[0], Com_h3.values)
         Dis_h4 = scipy.spatial.distance.cosine(Target_h4.values[0], Com_h4.values)
         Dis_h5 = scipy.spatial.distance.cosine(Target_h5.values[0], Com_h5.values)
 
-        Dis_global = np.linalg.norm(Target_global - Com_global) # Euclidean distance
-        Dis = (Dis_h1 + Dis_h2 +Dis_h3 + Dis_h4 + Dis_h5 + Dis_global)/6
-        #Dis = scipy.spatial.distance.cosine(Target, Com) #cosine distance
+        Dis_global = np.linalg.norm(Target_global - Com_global)  # Euclidean distance
+        Dis = (Dis_h1 + Dis_h2 + Dis_h3 + Dis_h4 + Dis_h5 + Dis_global) / 6
+        # Dis = scipy.spatial.distance.cosine(Target, Com) #cosine distance
         dislist.append(Dis)
 
-    del(dislist[0])
+    del (dislist[0])
 
     new_data.insert(0, "Distance", dislist)
-    new_data = new_data.sort_values(by = "Distance")
+    new_data = new_data.sort_values(by="Distance")
     print(new_data.head(10))
-    for i in range(5): #save the target file itself and its 5 top matching
-        filename_list.append(new_data.iloc[i,2])
-    for j in range(5): #show meshes
+    for i in range(5):  # save the target file itself and its 5 top matching
+        filename_list.append(new_data.iloc[i, 2])
+    for j in range(5):  # show meshes
         file = new_data.loc[new_data["fileName"] == filename_list[j]]
         number = float(filename_list[j][0:-4])
-        direname1 = file.iloc[:,1].values[0]
-        Dis = file.iloc[:,0].values[0]
+        direname1 = file.iloc[:, 1].values[0]
+        Dis = file.iloc[:, 0].values[0]
         Dis_list.append(Dis)
         mesh = Normalization(
-            '/Users/jack/Desktop/privateStuff/UUstuff/2019-2020/period1/MR/assignment/LabeledDB/LabeledDB_new' + '/' + str(
+            'LabeledDB/' + '/' + str(
                 direname1) + '/' + str(int(number)) + '.off')
 
         meshlist.append(mesh)
     print(Dis_list)
     return meshlist
+
 
 class Ui_MainWindow(QtWidgets.QWidget):
     def setupUi(self, MainWindow):
@@ -336,7 +337,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
                                                          "OFF Files (*.off);;PLY Files (*.ply)")
         [dirname, bfilename] = os.path.split(filename)
         print(bfilename)
-        meshlist = querying(bfilename)
+        meshlist = querying(bfilename, dirname)
         QMessageBox.warning(self,
                             "错误",
                             "Success",
@@ -365,22 +366,25 @@ class Ui_MainWindow(QtWidgets.QWidget):
     def showmesh3(self):
         global meshlist
         meshlist[3].show()
+
     def showmesh4(self):
         global meshlist
         meshlist[4].show()
 
     def t_SNE(self):
         # load the feature
-        path = '/Users/jack/Desktop/personalProjects/Multi_media/feature/small_all_feature.csv'
+        path = 'csvFiles/features_final.csv'
         data = pd.read_csv(path)
 
-        # load the labels and binarize the labels
-        path2 = '/Users/jack/Desktop/personalProjects/Multi_media/feature/small_before_refinement.csv'
-        data2 = pd.read_csv(path2)
-        classList = []
-        for i in data.iloc[:, 0]:
-            className = data2.loc[data2['fileName'] == i].iloc[0, 0]
-            classList.append(className)
+        # # load the labels and binarize the labels
+        # path2 = 'csvFiles/small_before_refinement.csv'
+        # data2 = pd.read_csv(path2)
+        # classList = []
+        # for i in data.iloc[:, 0]:
+        #     className = data2.loc[data2['fileName'] == i].iloc[0, 0]
+        #     classList.append(className)
+
+        classList = data["className"].values
 
         lb = preprocessing.LabelBinarizer()
         lb.fit(classList)
@@ -396,7 +400,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
 
             # nomalize feature data
             features = (csvData.iloc[:, 1:] - csvData.iloc[:, 1:].min()) / (
-                        csvData.iloc[:, 1:].max() - csvData.iloc[:, 1:].min())
+                    csvData.iloc[:, 1:].max() - csvData.iloc[:, 1:].min())
             for i in range(features.shape[0]):
                 v = features.iloc[i]
                 t.add_item(i, v)
@@ -433,8 +437,8 @@ class Ui_MainWindow(QtWidgets.QWidget):
             #   print(classList[0:len(label)])
             #   print(new_labels)
             feature = (csvData.iloc[:, 1:] - csvData.iloc[:, 1:].min()) / (
-                        csvData.iloc[:, 1:].max() - csvData.iloc[:, 1:].min())
-            features_embedded = TSNE(n_components=2,perplexity=10).fit_transform(feature)
+                    csvData.iloc[:, 1:].max() - csvData.iloc[:, 1:].min())
+            features_embedded = TSNE(n_components=2, perplexity=10).fit_transform(feature)
             return features_embedded, new_labels
 
         features_embedded, labelsIndex = T_SNE(data, labels)
