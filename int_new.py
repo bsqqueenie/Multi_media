@@ -385,7 +385,6 @@ class Ui_MainWindow(QtWidgets.QWidget):
         lb = preprocessing.LabelBinarizer()
         lb.fit(classList)
         labels = lb.transform(classList)
-        print(labels)
         # print(feature.shape)
         # print(labels)
 

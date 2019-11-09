@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="44f049a1-6cf3-4e11-b796-b754df0557ae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/csvFiles/LPSB_features_final.csv" beforeDir="false" afterPath="$PROJECT_DIR$/csvFiles/LPSB_features_final.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/csvFiles/small_after_refinement.csv" beforeDir="false" afterPath="$PROJECT_DIR$/csvFiles/small_after_refinement.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/csvFiles/small_before_refinement.csv" beforeDir="false" afterPath="$PROJECT_DIR$/csvFiles/small_before_refinement.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/csvFiles/features_final.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/int_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/int_new.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/issue_final.txt" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -65,11 +60,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/int_new.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-692">
-              <caret line="384" column="41" selection-start-line="384" selection-start-column="27" selection-end-line="384" selection-end-column="41" />
+            <state relative-caret-position="186">
+              <caret line="386" column="40" selection-start-line="386" selection-start-column="40" selection-end-line="386" selection-end-column="40" />
               <folding>
                 <element signature="e#191#205#0" expanded="true" />
                 <element signature="e#16715#17922#0" />
@@ -102,19 +97,12 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/csvFiles/small_before_refinement.csv">
           <provider selected="true" editor-type-id="text-editor">
             <state>
               <caret selection-end-line="4" selection-end-column="53" />
             </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/csvFiles/features_final.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2048" />
           </provider>
         </entry>
       </file>
@@ -172,10 +160,10 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/int.py" />
         <option value="$PROJECT_DIR$/test_visualization.py" />
-        <option value="$PROJECT_DIR$/int_new.py" />
         <option value="$PROJECT_DIR$/csvFiles/LPSB_features_final.csv" />
         <option value="$PROJECT_DIR$/csvFiles/small_before_refinement.csv" />
         <option value="$PROJECT_DIR$/data_processing.py" />
+        <option value="$PROJECT_DIR$/int_new.py" />
       </list>
     </option>
   </component>
@@ -365,12 +353,12 @@
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17381974" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17381974" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3299363" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.08535032" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.08535032" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -379,7 +367,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.3299363" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.3299363" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -441,17 +429,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/int_new.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-692">
-          <caret line="384" column="41" selection-start-line="384" selection-start-column="27" selection-end-line="384" selection-end-column="41" />
-          <folding>
-            <element signature="e#191#205#0" expanded="true" />
-            <element signature="e#16715#17922#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-412">
@@ -473,6 +450,17 @@
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret selection-end-line="4" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/int_new.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="386" column="40" selection-start-line="386" selection-start-column="40" selection-end-line="386" selection-end-column="40" />
+          <folding>
+            <element signature="e#191#205#0" expanded="true" />
+            <element signature="e#16715#17922#0" />
+          </folding>
         </state>
       </provider>
     </entry>
