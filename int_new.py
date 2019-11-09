@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 import trimesh
+import math
 import numpy as np
 import os
 import pandas as pd
@@ -22,7 +23,7 @@ meshlist = []
 Dis_list = []
 
 def Normalization(path):
-    ori = [0,0,0]
+    ori= [0,0,0]
     try:
         mesh = trimesh.load_mesh(path)
     except:
@@ -40,6 +41,7 @@ def Normalization(path):
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
     mesh.show()
     '''
+
     # Centering
 
     center = sum(mesh.vertices) / mesh.vertices.shape[0]
@@ -68,7 +70,7 @@ def Normalization(path):
 
     # Alignment
 
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=3)
     Reduced_mesh = pca.fit_transform(mesh.vertices)
     #print(pca.components_)
 
@@ -79,13 +81,22 @@ def Normalization(path):
     transform_y = trimesh.geometry.align_vectors(pca.components_[1], [0, 1, 0])
     mesh.apply_transform(transform_y)
     Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
-    #print(pca.components_)
+
+    '''
+    transform_z = trimesh.geometry.align_vectors(pca.components_[2], [0, 0, 1])
+    mesh.apply_transform(transform_z)
+    Reduced_mesh_newy = pca.fit_transform(mesh.vertices)
+    '''
+
+    print(pca.components_)
+
     '''
     print('Alignment done')
     print('Barycenter:', sum(mesh.vertices) / mesh.vertices.shape[0])
     print('The size of the bounding box(length,width,height):', mesh.bounding_box_oriented.primitive.extents, "\n")
     mesh.show()
     '''
+
     # Flipping
     center = sum(mesh.vertices) / mesh.vertices.shape[0]
     moment_lx = 0
@@ -94,33 +105,41 @@ def Normalization(path):
     moment_ry = 0
     moment_lz = 0
     moment_rz = 0
-
+    thread = [0, 0, 1]
+    
     for vertex in mesh.vertices:
-        if vertex[0] <= center[0]:
-            moment_lx += np.linalg.norm(vertex - ori)
+        a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
+        if vertex[0] <= 0:
+            moment_lx += np.linalg.norm(vertex - center)*math.sin(a[1])
         else:
-            moment_rx += np.linalg.norm(vertex - ori)
-    if moment_lx < moment_rx:  # right side of x axis should be the moment higher side
+            moment_rx += np.linalg.norm(vertex - center)*math.sin(a[1])
+    if moment_lx < moment_rx:  # left side of x axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([-1, 0, 0], [1, 0, 0])
         mesh.apply_transform(transform)
 
     for vertex in mesh.vertices:
-        if vertex[1] <= center[1]:
-            moment_ly += np.linalg.norm(vertex - ori)
+        a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
+        if vertex[1] <= 0:
+            moment_ly += np.linalg.norm(vertex - center) * math.sin(a[1])
         else:
-            moment_ry += np.linalg.norm(vertex - ori)
-    if moment_ly < moment_ry:  # right side of y axis should be the moment higher side
+            moment_ry += np.linalg.norm(vertex - center) * math.sin(a[1])
+    if moment_ly < moment_ry:  # left side of y axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([0, -1, 0], [0, 1, 0])
         mesh.apply_transform(transform)
 
     for vertex in mesh.vertices:
-        if vertex[2] <= center[2]:
-            moment_lz += np.linalg.norm(vertex - ori)
+        a = trimesh.geometry.align_vectors(vertex, thread, return_angle=True)
+        if vertex[2] <= 0:
+            moment_lz += np.linalg.norm(vertex - center) * math.sin(a[1])
         else:
-            moment_rz += np.linalg.norm(vertex - ori)
+            moment_rz += np.linalg.norm(vertex - center) * math.sin(a[1])
+
     if moment_lz < moment_rz:  # right side of z axis should be the moment higher side
         transform = trimesh.geometry.align_vectors([0, 0, -1], [0, 0, 1])
         mesh.apply_transform(transform)
+
+
+
     '''
     print('Flipping done')
     print('Barycenter:', sum(mesh.vertices) / mesh.vertices.shape[0])
@@ -144,7 +163,7 @@ def querying(filename):
     global meshlist, Dis_list
     filename_list = []
     dislist = [0]
-    data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/all_feature_small.csv")
+    data = pd.read_csv("/Users/darkqian/PycharmProjects/MR/Multi_meadia/feature/features_final.csv")
 
     norm_data = (data.iloc[:,2:] - data.iloc[:,2:].min()) / (data.iloc[:,2:].max() - data.iloc[:,2:].min())
 
@@ -152,12 +171,11 @@ def querying(filename):
     #norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
     new_data = pd.concat([data.iloc[:,0:2], norm_data], 1)
     row = new_data.shape[0]
+    print(new_data.head(10))
     Target = new_data.loc[new_data["fileName"]==filename] #set target model
 
     Target_global = Target.iloc[:,2:7]
     Target_h1 = Target.iloc[:,7:15].apply(lambda x: x/8 )
-    print(Target_global)
-    print(Target_h1)
     Target_h2 = Target.iloc[:,15:23].apply(lambda x: x/8 )
     Target_h3 = Target.iloc[:,23:31].apply(lambda x: x/8 )
     Target_h4 = Target.iloc[:,31:39].apply(lambda x: x/8 )
@@ -171,11 +189,11 @@ def querying(filename):
         Com_h4 = new_data.iloc[i, 31:39].apply(lambda x: x/8 )
         Com_h5 = new_data.iloc[i, 39:47].apply(lambda x: x/8)
 
-        Dis_h1 = scipy.stats.wasserstein_distance(Target_h1.values[0], Com_h1.values) #Earth mover's distance
-        Dis_h2 = scipy.stats.wasserstein_distance(Target_h2.values[0], Com_h2.values)
-        Dis_h3 = scipy.stats.wasserstein_distance(Target_h3.values[0], Com_h3.values)
-        Dis_h4 = scipy.stats.wasserstein_distance(Target_h4.values[0], Com_h4.values)
-        Dis_h5 = scipy.stats.wasserstein_distance(Target_h5.values[0], Com_h5.values)
+        Dis_h1 = scipy.spatial.distance.cosine(Target_h1.values[0], Com_h1.values) #Earth mover's distance
+        Dis_h2 = scipy.spatial.distance.cosine(Target_h2.values[0], Com_h2.values)
+        Dis_h3 = scipy.spatial.distance.cosine(Target_h3.values[0], Com_h3.values)
+        Dis_h4 = scipy.spatial.distance.cosine(Target_h4.values[0], Com_h4.values)
+        Dis_h5 = scipy.spatial.distance.cosine(Target_h5.values[0], Com_h5.values)
 
         Dis_global = np.linalg.norm(Target_global - Com_global) # Euclidean distance
         Dis = (Dis_h1 + Dis_h2 +Dis_h3 + Dis_h4 + Dis_h5 + Dis_global)/6
