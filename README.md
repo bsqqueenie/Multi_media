@@ -1,4 +1,4 @@
-# Multi_meadia
+# 3d shape retrieval system
 
 1. Before run this system, there are several parameters needed to be double checked, in  `data_processing.py`:
     * `DSpath = 'DataSet/LabeledDB'`, indicating your database root path
