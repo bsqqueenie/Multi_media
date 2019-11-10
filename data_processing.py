@@ -460,7 +460,7 @@ def readNewMesh(path, max=7000):  # input the root paht, not enter the path for 
 
 # set the path
 
-DSpath = 'DataSet/LabeledDB/Ant'
+DSpath = 'DataSet/LabeledDB'
 # location where stores all the refined meshes
 refinedPath = 'DataSet/RefinedMeshes'
 cleanOff_jar = 'cleanoff.jar'

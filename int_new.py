@@ -24,11 +24,7 @@ import data_processing as Pro
 meshlist = []
 Dis_list = []
 
-# DSpath = 'DataSet/LabeledDB/Ant'
-# # location where stores all the refined meshes
-# refinedPath = 'DataSet/RefinedMeshes'
-# cleanOff_jar = 'cleanoff.jar'
-# cleanMesh= 'refined_mesh.txt'
+
 
 def Normalization(path):
     ori = [0, 0, 0]
