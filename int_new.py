@@ -19,10 +19,16 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from sklearn import preprocessing
 import scipy
+import data_processing as Pro
 
 meshlist = []
 Dis_list = []
 
+# DSpath = 'DataSet/LabeledDB/Ant'
+# # location where stores all the refined meshes
+# refinedPath = 'DataSet/RefinedMeshes'
+# cleanOff_jar = 'cleanoff.jar'
+# cleanMesh= 'refined_mesh.txt'
 
 def Normalization(path):
     ori = [0, 0, 0]
@@ -176,24 +182,29 @@ def querying(filename, direname):
     Dis_list = []
     filename_list = []
     dislist = [0]
-
-    data = pd.read_csv("csvFiles/features_final.csv")
-
+    Targetdata = Pro.readNewMesh(direname + "/" + filename)
+    #print(Targetdata)
+    data = pd.read_csv("csvFiles/LPSB_features_final.csv")
+    data.loc[380,1:] = Targetdata[0]
     norm_data = (data.iloc[:, 2:] - data.iloc[:, 2:].min()) / (data.iloc[:, 2:].max() - data.iloc[:, 2:].min())
-
     # norm_data = data.iloc[:,1:] / data.iloc[:,1:].max(axis=0)
     # norm_data = (data.iloc[:,1:] - data.iloc[:,1:].mean()) / (data.iloc[:,1:].std())
     new_data = pd.concat([data.iloc[:, 0:2], norm_data], 1)
+    Target = new_data.loc[380]
+    #print(Target)
     row = new_data.shape[0]
-    print(new_data.head(10))
-    Target = new_data.loc[new_data["fileName"] == filename]  # set target model
+    print(row)
+    new_data = new_data.drop([380])
+    row = new_data.shape[0]
+    print(row)
+    #Target = new_data.loc[new_data["fileName"] == filename]  # set target model
+    Target_global = Target.values[2:7]
+    Target_h1 = [i / 8 for i in Target.values[7:15]]
+    Target_h2 = [i / 8 for i in Target.values[15:23]]
+    Target_h3 = [i / 8 for i in Target.values[23:31]]
+    Target_h4 = [i / 8 for i in Target.values[31:39]]
+    Target_h5 = [i / 8 for i in Target.values[39:47]]
 
-    Target_global = Target.iloc[:, 2:7]
-    Target_h1 = Target.iloc[:, 7:15].apply(lambda x: x / 8)
-    Target_h2 = Target.iloc[:, 15:23].apply(lambda x: x / 8)
-    Target_h3 = Target.iloc[:, 23:31].apply(lambda x: x / 8)
-    Target_h4 = Target.iloc[:, 31:39].apply(lambda x: x / 8)
-    Target_h5 = Target.iloc[:, 39:47].apply(lambda x: x / 8)
     for i in range(row):
         Com_global = new_data.iloc[i, 2:7]
         Com_h1 = new_data.iloc[i, 7:15].apply(lambda x: x / 8)
@@ -202,11 +213,11 @@ def querying(filename, direname):
         Com_h4 = new_data.iloc[i, 31:39].apply(lambda x: x / 8)
         Com_h5 = new_data.iloc[i, 39:47].apply(lambda x: x / 8)
 
-        Dis_h1 = scipy.spatial.distance.cosine(Target_h1.values[0], Com_h1.values)  # Earth mover's distance
-        Dis_h2 = scipy.spatial.distance.cosine(Target_h2.values[0], Com_h2.values)
-        Dis_h3 = scipy.spatial.distance.cosine(Target_h3.values[0], Com_h3.values)
-        Dis_h4 = scipy.spatial.distance.cosine(Target_h4.values[0], Com_h4.values)
-        Dis_h5 = scipy.spatial.distance.cosine(Target_h5.values[0], Com_h5.values)
+        Dis_h1 = scipy.spatial.distance.cosine(Target_h1, Com_h1.values)  # Earth mover's distance
+        Dis_h2 = scipy.spatial.distance.cosine(Target_h2, Com_h2.values)
+        Dis_h3 = scipy.spatial.distance.cosine(Target_h3, Com_h3.values)
+        Dis_h4 = scipy.spatial.distance.cosine(Target_h4, Com_h4.values)
+        Dis_h5 = scipy.spatial.distance.cosine(Target_h5, Com_h5.values)
 
         Dis_global = np.linalg.norm(Target_global - Com_global)  # Euclidean distance
         Dis = (Dis_h1 + Dis_h2 + Dis_h3 + Dis_h4 + Dis_h5 + Dis_global) / 6
@@ -214,24 +225,27 @@ def querying(filename, direname):
         dislist.append(Dis)
 
     del (dislist[0])
-
     new_data.insert(0, "Distance", dislist)
+
     new_data = new_data.sort_values(by="Distance")
+    filename_list.append(filename)
+    mesh = Normalization(direname + "/" + filename)
+    meshlist.append(mesh)
     print(new_data.head(10))
-    for i in range(5):  # save the target file itself and its 5 top matching
+    for i in range(1,5):  # save the target file itself and its 5 top matching
         filename_list.append(new_data.iloc[i, 2])
-    for j in range(5):  # show meshes
+    for j in range(1,5):  # show meshes
         file = new_data.loc[new_data["fileName"] == filename_list[j]]
         number = float(filename_list[j][0:-4])
         direname1 = file.iloc[:, 1].values[0]
         Dis = file.iloc[:, 0].values[0]
         Dis_list.append(Dis)
         mesh = Normalization(
-            'DataSet/LabeledDB/' + '/' + str(
+            'DataSet/LabeledDB' + '/' + str(
                 direname1) + '/' + str(int(number)) + '.off')
 
         meshlist.append(mesh)
-    print(Dis_list)
+
     return meshlist
 
 
@@ -346,10 +360,10 @@ class Ui_MainWindow(QtWidgets.QWidget):
     def query(self):
         global Dis_list
         _translate = QtCore.QCoreApplication.translate
-        self.label.setText(_translate("MainWindow", "Dis=" + str(Dis_list[1])))
-        self.label_2.setText(_translate("MainWindow", "Dis=" + str(Dis_list[2])))
-        self.label_3.setText(_translate("MainWindow", "Dis=" + str(Dis_list[3])))
-        self.label_4.setText(_translate("MainWindow", "Dis=" + str(Dis_list[4])))
+        self.label.setText(_translate("MainWindow", "Dis=" + str(Dis_list[0])))
+        self.label_2.setText(_translate("MainWindow", "Dis=" + str(Dis_list[1])))
+        self.label_3.setText(_translate("MainWindow", "Dis=" + str(Dis_list[2])))
+        self.label_4.setText(_translate("MainWindow", "Dis=" + str(Dis_list[3])))
 
     def showmesh(self):
         global meshlist
@@ -372,6 +386,8 @@ class Ui_MainWindow(QtWidgets.QWidget):
         meshlist[4].show()
 
     def t_SNE(self):
+
+
         # load the feature
         path = 'csvFiles/LPSB_features_final.csv'
         data = pd.read_csv(path).iloc[:,1:]
@@ -380,13 +396,13 @@ class Ui_MainWindow(QtWidgets.QWidget):
         path2 = 'csvFiles/small_before_refinement.csv'
         data2 = pd.read_csv(path2)
         classList = []
-        for i in pd.read_csv(path)['className'].values:
-            classList.append(i)
+        for i in data.iloc[:, 0]:
+            className = data2.loc[data2['fileName'] == i].iloc[0, 0]
+            classList.append(className)
+
         lb = preprocessing.LabelBinarizer()
         lb.fit(classList)
         labels = lb.transform(classList)
-        # print(feature.shape)
-        # print(labels)
 
         def annQuery(csvData, classSet,
                      queryMesh=100):  # in the end, the queryMesh should be changed to a mesh file or the feature of the mesh
@@ -480,4 +496,23 @@ class Ui_MainWindow(QtWidgets.QWidget):
         # plt.colorbar(ticks=range(53))
         plt.rcParams["figure.figsize"] = 10, 10
         plt.show()
+
+# def readNewMesh(path, max=7000):  # input the root paht, not enter the path for one specific file
+#
+#     mesh = trimesh.load_mesh(path)
+#     mesh.remove_duplicate_faces()
+#
+#     if Pro.Meshfilter(mesh)[0] <= max:
+#         nomalizedMesh = Pro.normalization([[os.path.basename(path), mesh]])
+#         featureStacks, columnsName = Pro.feature_extraction(nomalizedMesh)
+#
+#     if Pro.Meshfilter(mesh)[0] > max:
+#         with open(Pro.cleanMesh, 'w') as txt1:
+#             txt1.write(path)
+#         refineMeshPath =  Pro.cleanOffMesh(Pro.cleanMesh, Pro.refinedPath, Pro.cleanOff_jar)
+#         mesh  = trimesh.load_mesh(refineMeshPath)
+#         nomalizedMesh = Pro.normalization([[os.path.basename(path), mesh]])
+#         featureStacks, columnsName = Pro.feature_extraction(nomalizedMesh)
+#     # print(featureStacks)
+#     return featureStacks
 

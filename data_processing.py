@@ -436,14 +436,7 @@ def cleanOffMesh(cleanOFfListPath,outPutPath,jarPath,threshold = 7000):  # this 
                 # print(os.path.basename(inputpath),'vertices and faces:{},{}'.format(len(mesh_after.vertices),len(mesh_after.faces)))
     return refineFilePath
 
-# set the path
 
-# your data set path
-DSpath = 'DataSet/LabeledDB'
-# location where stores all the refined meshes
-refinedPath = 'DataSet/RefinedMeshes'
-cleanOff_jar = 'cleanoff.jar'
-cleanMesh= 'refined_mesh.txt'
 
 def readNewMesh(path, max=7000):  # input the root paht, not enter the path for one specific file
 
@@ -462,99 +455,93 @@ def readNewMesh(path, max=7000):  # input the root paht, not enter the path for 
         nomalizedMesh = normalization([[os.path.basename(path), mesh]])
         featureStacks, columnsName = feature_extraction(nomalizedMesh)
     # print(featureStacks)
-    return featureStacks[0][1:]
+    return featureStacks
 
 
+# set the path
 
-
-
-
-
-
-print('----process whole benchmark----')
-
-
-stacks1, meshList1,qualifiedStack = scanDB2(DSpath,cleanMeshMode=True)
-# store the data to csv
-pd.DataFrame(stacks1).to_csv("csvFiles/small_before_refinement.csv", header=False, index=False)
-
-print('----process unqualified meshes (vertices above 7000)----')
-
-# # refine unqualified meshes, the refined meshed will be stored at the outputpath
-cleanOFfListPathtxt = 'issue_final.txt'
-path_cleanOff = refinedPath
+DSpath = 'DataSet/LabeledDB/Ant'
+# location where stores all the refined meshes
+refinedPath = 'DataSet/RefinedMeshes'
 cleanOff_jar = 'cleanoff.jar'
-cleanOffMesh(cleanOFfListPathtxt,path_cleanOff,cleanOff_jar)
-#
-#
-#
-# # process the refined meshes
-
-path3 = refinedPath
-stacks3, meshList3,_ = scanDB2(path3,cleanMeshMode=False)
+cleanMesh= 'refined_mesh.txt'
+cleanOFFListPathtxt = 'issue_final.txt'
 
 
+def processDB(dataBasePath,needRefinedMeshPath,cleanOffTool):
+    print('----process whole benchmark----')
+
+    stacks1, meshList1, qualifiedStack = scanDB2(dataBasePath, cleanMeshMode=True)
+    # store the data to csv
+    pd.DataFrame(stacks1).to_csv("csvFiles/small_before_refinement.csv", header=False, index=False)
+
+    print('----process poorly-sampled meshes (vertices above 7000)----')
+
+    # # refine unqualified meshes, the refined meshed will be stored at the outputpath
+
+    path_cleanOff = refinedPath
+
+    cleanOffMesh(needRefinedMeshPath, path_cleanOff, cleanOffTool)
+    #
+    #
+    #
+    # # process the refined meshes
+
+    path3 = refinedPath
+    stacks3, meshList3, _ = scanDB2(path3, cleanMeshMode=False)
+
+    # combine all data
+    print('----combine all data----')
+
+    # replace the old values with refined values
+
+    refinedSmall = pd.DataFrame(stacks3)
+    oldValues = pd.DataFrame(qualifiedStack)
+
+    combinedDataFrame = pd.concat([oldValues, refinedSmall])
+    print('combineedDF:', combinedDataFrame.shape)
+
+    # store the refined data to csv
+
+    pd.DataFrame(combinedDataFrame).to_csv("csvFiles/small_after_refinement.csv", header=True, index=False)
+
+    finalMeshList = meshList1 + meshList3
+
+    print("the amount of valid meshes", len(finalMeshList))
+
+    print('---- Nomalization and return the new mesh list ----')
+    newMeshList = normalization(finalMeshList)
+
+    print("the amount of mesh after normalization:", len(newMeshList))
+
+    # feature extraction phase
+    print('---- feature extraction phase ----')
+
+    feature, header = feature_extraction(finalMeshList)
+    data = pd.DataFrame(feature, columns=header)
+    # pd.DataFrame(data).to_csv("feature.csv", header=True, index=False)
+
+    path2 = 'csvFiles/small_before_refinement.csv'
+
+    all_feature = data
+    class_table = pd.read_csv(path2)
+    className = []
+
+    for i in all_feature['fileName']:
+        className.append(class_table.loc[class_table['fileName'] == i].iloc[:, 0].values[0])
+
+    all_feature.insert(loc=0, column="className", value=className)
+    pd.DataFrame(all_feature).to_csv("csvFiles/LPSB_features_final.csv", header=True, index=False)
+    print("the whole database has been processed and features have been extracted")
 
 
-# combine all data
-print('----combine all data----')
 
-# replace the old values with refined values
+# process the whole LPSB
 
-refinedSmall = pd.DataFrame(stacks3)
-oldValues = pd.DataFrame(qualifiedStack)
-
-combinedDataFrame = pd.concat([oldValues,refinedSmall])
-print('combineedDF:', combinedDataFrame.shape)
-
-# store the refined data to csv
-
-pd.DataFrame(combinedDataFrame).to_csv("csvFiles/small_after_refinement.csv", header=True, index=False)
-
-finalMeshList=meshList1+meshList3
-
-print("the amount of valid meshes",len(finalMeshList))
+# processDB(DSpath,cleanOFFListPathtxt,cleanOff_jar)
 
 
 
-
-print('---- Nomalization and return the new mesh list ----')
-newMeshList = normalization(finalMeshList)
-
-
-print("the amount of mesh after normalization:", len(newMeshList))
-
-
-#feature extraction phase
-print('---- feature extraction phase ----')
-
-feature,header = feature_extraction(finalMeshList)
-data=pd.DataFrame(feature,columns=header)
-# pd.DataFrame(data).to_csv("feature.csv", header=True, index=False)
-
-
-
-path2 = 'csvFiles/small_before_refinement.csv'
-
-all_feature = data
-class_table = pd.read_csv(path2)
-className = []
-
-
-for i in all_feature['fileName']:
-
-    className.append(class_table.loc[class_table['fileName'] == i].iloc[:,0].values[0])
-
-all_feature.insert(loc=0, column="className", value=className)
-pd.DataFrame(all_feature).to_csv("csvFiles/LPSB_features_final.csv", header=True, index=False)
-
-
-
-
-
-
-
-#
-#
+# process one mesh file in order to extract the features
 # path = '/Users/jack/Desktop/personalProjects/Multi_media/DataSet/LabeledDB/Ant/81.off'
 # print(readNewMesh(path))
